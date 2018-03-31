@@ -8,12 +8,17 @@
 public class BTree {
 	
 	private int root; 
+	private IUDoubleLinkedList list;
+
+	public BTree() {
+	    list = new IUDoubleLinkedList();
+    }
+
+//	public int search(x, K) {
+//
+//	}
 	
-	public int search(x, K) {
-		
-	}
-	
-	public void insert(T, k) {
+//	public void insert(T, k) {
 		// s : current node you're in. 
 		// r : child node. 
 		
@@ -32,7 +37,7 @@ public class BTree {
 		  }
 		 */
 		
-	}
+//	}
 	
 	public void split(BTreeNode currentNode, int currentNodeIndex, BTreeNode childNode) {
 		/*
