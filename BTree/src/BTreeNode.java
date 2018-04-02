@@ -4,7 +4,7 @@
  * 
  * @author DavidMcNeill
  *
- * @param <T>
+ * @param <TreeObject>
  */
 public class BTreeNode<TreeObject> {
 
@@ -39,6 +39,10 @@ public class BTreeNode<TreeObject> {
 		// n[x] = 0
 		// Disk-write(x);
 		// T.root = x;
+	}
+
+	public BTreeNode() {
+
 	}
 
 	public boolean leaf() {
