@@ -21,7 +21,7 @@ public class BTree {
 //	public void insert(T, k) {
 		// s : current node you're in. 
 		// r : child node. 
-		
+
 		/*
 		  r = root[T]
 		  if (n[r] == 2*t - 1) { //node is full
