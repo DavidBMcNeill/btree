@@ -12,30 +12,26 @@ public class GeneBankCreateBTree {
 
     public static void main(String[] args) {
 
-        if (ArgsGenerate.validate(args)) {
-
-            System.out.println("our arguments validated correctly, let's go!");
-            System.out.printf("useCache: %b\n", ArgsGenerate.useCache);
-            System.out.printf("degree: %d\n", ArgsGenerate.degree);
-            System.out.printf("geneBankFile: %s\n", ArgsGenerate.geneBankFile);
-            System.out.printf("sequenceLength: %d\n", ArgsGenerate.sequenceLength);
-            System.out.printf("cacheSize: %d\n", ArgsGenerate.cacheSize);
-            System.out.printf("debugLevel: %d\n", ArgsGenerate.debugLevel);
-
-        } else {
+        if (!ArgsGenerate.validate(args)) {
             System.err.println("our arguments did not validate, quitting...");
+            return;
         }
 
-
-
-
-
-
-
-
-
-
+        CreateBTree creator = new CreateBTree();
+        if (creator.create())
+            showResults();
     }
+
+    private static void showResults() {
+        // TODO: show results
+        if (ArgsGenerate.debugLevel == 0) {
+            // something
+        } else {
+            // ArgsGenerate.debugLevel is 1
+            // something
+        }
+    }
+
 
 
 

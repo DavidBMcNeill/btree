@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * required arguments:
@@ -17,21 +20,46 @@ public class GeneBankSearch {
 	// file; use [a, c, t, g], upper- or lower-case
 
     public static void main(String[] args) {
-
         if (ArgsSearch.validate(args)) {
-
-            System.out.println("our arguments validated correctly, let's go!");
-            System.out.printf("useCache: %b\n", ArgsSearch.useCache);
-            System.out.printf("btreeFile: %s\n", ArgsSearch.btreeFile);
-            System.out.printf("queryFile: %s\n", ArgsSearch.queryFile);
-            System.out.printf("cacheSize: %d\n", ArgsSearch.cacheSize);
-            System.out.printf("debugLevel: %d\n", ArgsSearch.debugLevel);
-
+            run();
+            showResults();
         } else {
             System.err.println("our arguments did not validate, quitting...");
         }
     }
 
+    private static void run() {
+        BTreeNode node;
+        BufferedReader reader;
+        SearchBTree searcher = new SearchBTree();
 
+        try {
+            reader = new BufferedReader(
+                new FileReader(ArgsSearch.queryFile)
+            );
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                node = searcher.search(line);  // TODO: parse the pattern from the line
+                doSomethingWithNode(node);     // node is a BTreeNode that has our pattern
+            }
+        } catch (IOException e) {
+            System.err.printf("error searching file: %s", e);
+        }
+    }
+
+    private static void doSomethingWithNode(BTreeNode node) {
+        // TODO: print the node to the output file (i think)
+    }
+
+    private static void showResults() {
+        // TODO: show results
+        if (ArgsGenerate.debugLevel == 0) {
+            // something
+        } else {
+            // This file has no 1 level debug required,
+            // though we could implement one if we want.
+        }
+    }
 
 }

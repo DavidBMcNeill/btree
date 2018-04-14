@@ -1,27 +1,16 @@
 public class BTreeMetadata {
 
-    public int t;
-    public int k;
     public int degree;
     public int nodeSize;  // size of a node in bytes
-    public long rootOffset;
+    public int sequenceLength;
 
     // each int is 4 bytes, longs are 8 bytes
-    private static int size = 4 + 4 + 4 + 4 + 8;
+    public final static int size = 4 + 4 + 4 + 4 + 8;
 
-    public BTreeMetadata(int degree, int k, int t, int nodeSize, long rootOffset) {
-        this.k = k;
-        this.t = t;
+    public BTreeMetadata(int degree, int sequenceLength, int nodeSize) {
+        this.sequenceLength = sequenceLength;
         this.degree = degree;
         this.nodeSize = nodeSize;
-        this.rootOffset = rootOffset;
-
-
-    }
-
-    public static int size() {
-        return size;
-
     }
 
 }

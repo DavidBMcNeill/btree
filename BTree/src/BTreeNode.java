@@ -29,7 +29,7 @@ public class BTreeNode<TreeObject> {
 	private int[] childPointers; // 2*t child node pointers + 1 parent pointer
 	private int parent; // + 1 parent pointer
 
-    private static int size;
+    public static int size;
 
 	// allocate size of node at creation, fixed: full size: 2t - 1
 	public BTreeNode(int degree, int index) {
@@ -47,13 +47,6 @@ public class BTreeNode<TreeObject> {
 	public BTreeNode() {
 
 	}
-
-	public static int size() {
-        // optimal degree calculation:
-        // (BTree node meta-data) + (2t - 1) * (size of tree object in bytes) + (2t
-        // ... + 1) * (size of BTreeNode pointer) <= 4096 bytes
-        return 12345;
-    }
 
     public int index() {
 	    return index;

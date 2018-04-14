@@ -6,13 +6,29 @@ public class BTreeFile {
 
     private RandomAccessFile me;
     private BTreeMetadata metadata;
+    private File geneBankFile;
 
-    public BTreeFile(File filename, BTreeMetadata metadata) throws IOException {
-        this.metadata = metadata;
+    public BTreeFile() throws IOException {
+
+        this.metadata = new BTreeMetadata(
+            ArgsGenerate.degree,
+            ArgsGenerate.sequenceLength,
+            BTreeNode.size
+        );
+
+        this.geneBankFile = generateBtreeFilename();
 
         // "rwd" tells the reader to update the files's content on disk for every update.
         // this is more efficient and guarantees all modifications have been made.
-        me = new RandomAccessFile(filename, "rwd");
+        me = new RandomAccessFile(generateBtreeFilename(), "rwd");
+    }
+
+    private File generateBtreeFilename() {
+        return new File(String.format("%s.btree.data.%s.%s",
+            geneBankFile,
+            metadata.sequenceLength,
+            metadata.degree
+        ));
     }
 
     /**
@@ -20,20 +36,18 @@ public class BTreeFile {
      * @throws IOException
      */
     private void writeTreeMetadata() throws IOException {
-        // metadata belongs at the beginning of the me
+        // metadata belongs at the beginning of the file
         me.seek(0);
 
         // ordering is important, must match readTreeMetadata.
-        me.writeInt(metadata.k);
-        me.writeInt(metadata.t);
         me.writeInt(metadata.degree);
-        me.writeInt(metadata.nodeSize);
-        me.writeLong(metadata.rootOffset);
+        me.writeInt(metadata.nodeSize);  // same as 'root offset'
+        me.writeInt(metadata.sequenceLength);
     }
 
     /**
      * Reads the BTree's metadata in the binary btree
-     * me, returns the data as a BTreeMetadata class.
+     * file, returns the data as a BTreeMetadata class.
      * @throws IOException
      */
     private BTreeMetadata readTreeMetadata() throws IOException {
@@ -41,11 +55,9 @@ public class BTreeFile {
 
         // ordering is important, must match writeTreeMetadata.
         return new BTreeMetadata(
-            me.readInt(),  // k
-            me.readInt(),  // t
             me.readInt(),  // degree
             me.readInt(),  // nodeSize
-            me.readLong()  // rootOffset
+            me.readInt()   // sequenceLength
         );
     }
 
@@ -58,7 +70,7 @@ public class BTreeFile {
     public long write(BTreeNode node) throws IOException {
 
         // start after the btree metadata, then go "index" node "size"s over.
-        long spot = BTreeMetadata.size() + (node.index() * BTreeNode.size());
+        long spot = BTreeMetadata.size + (node.index() * BTreeNode.size);
 
         me.seek(spot);
 
@@ -68,8 +80,9 @@ public class BTreeFile {
         return spot;
     }
 
-    // public BTreeNode read() {
-    //    // TODO: read a node from disk
-    // }
+     public BTreeNode read() {
+        // TODO: read a node from disk
+         return new BTreeNode();  // or null if not found
+     }
 
 }
