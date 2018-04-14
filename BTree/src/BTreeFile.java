@@ -4,7 +4,7 @@ import java.io.RandomAccessFile;
 
 public class BTreeFile {
 
-    private RandomAccessFile me;
+    private RandomAccessFile file;
     private BTreeMetadata metadata;
     private File geneBankFile;
 
@@ -20,7 +20,7 @@ public class BTreeFile {
 
         // "rwd" tells the reader to update the files's content on disk for every update.
         // this is more efficient and guarantees all modifications have been made.
-        me = new RandomAccessFile(generateBtreeFilename(), "rwd");
+        file = new RandomAccessFile(generateBtreeFilename(), "rwd");
     }
 
     private File generateBtreeFilename() {
@@ -32,17 +32,17 @@ public class BTreeFile {
     }
 
     /**
-     * Writes the BTree's metadata to the binary btree me.
+     * Writes the BTree's metadata to the binary btree file.
      * @throws IOException
      */
     private void writeTreeMetadata() throws IOException {
         // metadata belongs at the beginning of the file
-        me.seek(0);
+        file.seek(0);
 
         // ordering is important, must match readTreeMetadata.
-        me.writeInt(metadata.degree);
-        me.writeInt(metadata.nodeSize);  // same as 'root offset'
-        me.writeInt(metadata.sequenceLength);
+        file.writeInt(metadata.degree);
+        file.writeInt(metadata.nodeSize);  // same as 'root offset'
+        file.writeInt(metadata.sequenceLength);
     }
 
     /**
@@ -51,13 +51,13 @@ public class BTreeFile {
      * @throws IOException
      */
     private BTreeMetadata readTreeMetadata() throws IOException {
-        me.seek(0);
+        file.seek(0);
 
         // ordering is important, must match writeTreeMetadata.
         return new BTreeMetadata(
-            me.readInt(),  // degree
-            me.readInt(),  // nodeSize
-            me.readInt()   // sequenceLength
+            file.readInt(),  // degree
+            file.readInt(),  // nodeSize
+            file.readInt()   // sequenceLength
         );
     }
 
@@ -72,10 +72,10 @@ public class BTreeFile {
         // start after the btree metadata, then go "index" node "size"s over.
         long spot = BTreeMetadata.size + (node.index() * BTreeNode.size);
 
-        me.seek(spot);
+        file.seek(spot);
 
-        // TODO:  write stuff to the me like so:
-        // me.writeInt(node.stuff);
+        // TODO:  write stuff to the file like so:
+        // file.writeInt(node.stuff);
 
         return spot;
     }
