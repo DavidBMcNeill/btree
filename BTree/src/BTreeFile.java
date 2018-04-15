@@ -74,7 +74,7 @@ public class BTreeFile {
 
         me.seek(spot);
 
-        // TODO:  write stuff to the me like so:
+        // TODO:  write stuff to the file like so:
         // me.writeInt(node.stuff);
 
         return spot;
