@@ -13,7 +13,7 @@ public class BTreeFile {
         this.metadata = new BTreeMetadata(
             ArgsGenerate.degree,
             ArgsGenerate.sequenceLength,
-            BTreeNode.size
+            BTreeNode.SIZE
         );
 
         this.geneBankFile = generateBtreeFilename();
@@ -39,7 +39,7 @@ public class BTreeFile {
         // metadata belongs at the beginning of the file
         file.seek(0);
 
-        // ordering is important, must match readTreeMetadata.
+        // ordering is important, must match readTreeMetadata().
         file.writeInt(metadata.degree);
         file.writeInt(metadata.nodeSize);  // same as 'root offset'
         file.writeInt(metadata.sequenceLength);
@@ -53,7 +53,7 @@ public class BTreeFile {
     private BTreeMetadata readTreeMetadata() throws IOException {
         file.seek(0);
 
-        // ordering is important, must match writeTreeMetadata.
+        // these values must match writeTreeMetadata().
         return new BTreeMetadata(
             file.readInt(),  // degree
             file.readInt(),  // nodeSize
@@ -70,7 +70,7 @@ public class BTreeFile {
     public long write(BTreeNode node) throws IOException {
 
         // start after the btree metadata, then go "index" node "size"s over.
-        long spot = BTreeMetadata.size + (node.index() * BTreeNode.size);
+        long spot = BTreeMetadata.SIZE + (node.index() * BTreeNode.SIZE);
 
         file.seek(spot);
 
@@ -82,7 +82,11 @@ public class BTreeFile {
 
      public BTreeNode read() {
         // TODO: read a node from disk
-         return new BTreeNode();  // or null if not found
-     }
+
+        // placeholder
+        BTreeNode nodeWeFound = new BTreeNode(666);
+
+        return nodeWeFound;  // or null if not found
+    }
 
 }

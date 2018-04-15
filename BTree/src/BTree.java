@@ -7,39 +7,59 @@
  */
 public class BTree {
 	
-	private int root; 
+	private BTreeNode root;
 	private IUDoubleLinkedList list;
+	private int currentNodeID;  // incremented every time a node is inserted
 
 	public BTree() {
+        currentNodeID = 0;
 	    list = new IUDoubleLinkedList();
+	    root = new BTreeNode(currentNodeID);
     }
 
-//	public int search(x, K) {
-//
-//	}
-	
-//	public void insert(T, k) {
-		// s : current node you're in. 
-		// r : child node. 
+    /**
+     * Insert BTreeNode into the tree.
+     * @param k
+     */
+    public void insert(int k) {
 
-		/*
-		  r = root[T]
-		  if (n[r] == 2*t - 1) { //node is full
-		    BTreeNode s = allocate-node(); // BTreeNode constructor
-		    root[T] = s;
-		    leaf[s] = false;
-		    n[s] = null;
-		    c1[s] = r;
-		    split(s, 1, r); // 1 is the index
-		    insertNonFull(s, k); // recursive procedure
-		  } else { // node isn't full
-		    insertNonFull(s, k);
-		  }
-		 */
-		
-//	}
-	
-	public void split(BTreeNode currentNode, int currentNodeIndex, BTreeNode childNode) {
+        // s : current node you're in.
+        // r : child node.
+
+        /*
+          r = root[T]
+          if (n[r] == 2*t - 1) { //node is full
+            BTreeNode s = allocate-node(); // BTreeNode constructor
+            root[T] = s;
+            leaf[s] = false;
+            n[s] = null;
+            c1[s] = r;
+            split(s, 1, r); // 1 is the index
+            insertNonFull(s, k); // recursive procedure
+          } else { // node isn't full
+            insertNonFull(s, k);
+          }
+         */
+
+        // not sure about k's type yet. should it
+        // be a BTreeNode or an int for the key.
+
+        if (root.isFull()) {
+            currentNodeID++;
+            BTreeNode s = new BTreeNode(currentNodeID);
+            root= s;
+            s.setChild(root);
+            splitChild(s, 1, root);
+            insertNotFull(s, k);
+        } else {
+            insertNotFull(root, k);
+        }
+
+    }
+
+    public boolean splitChild(BTreeNode x, int i, BTreeNode y) {
+	    // x = currentNode, i = currentNodeIndex, y = childNode
+
 		/*
 		 BTreeNode z = allocate-node(); // initialize new node's attributes
 		 leaf[z] = leaf[y];
@@ -58,10 +78,22 @@ public class BTree {
 		 }
 		 c<i+1>[x] = z;
 		 */
-	}
-	
-	public void insertNonFull() {
-		
-	}
+
+        // TODO: split child node in the tree
+	    // TODO: get the node index (is this the variable 'i'?
+	    int fakeIndex = 666;
+
+	    BTreeNode z = new BTreeNode(fakeIndex);
+        z.isLeaf(y.isLeaf());
+        z.setParent(x);
+
+        return true;
+    }
+
+    public boolean insertNotFull(BTreeNode x, int k) {
+        // TODO: insertNotFull method in BTree
+        return true;
+    }
+
 
 }

@@ -1,58 +1,89 @@
+import java.util.Arrays;
 
 /**
- * "should be inner class of BTree" [why?]
- * 
- * @author DavidMcNeill
- *
- * @param <TreeObject>
+ * Represents a Node in a BTree.
  */
-public class BTreeNode<TreeObject> {
-
-	// int n; boolean leaf; int location (cache)
-	// metadata: ADD MORE TO HELP W/ IMPLEMENTATION
-	private int numChildren;
-	private boolean leaf;
-	private int location; // the location of this node in the cache.
+public class BTreeNode {
 
     // every node gets a unique 0-indexed number in the BTree when it's inserted.
     // this is needed for BTreeFile to place it in the binary file.
-	private int index;
+    private int id;
 
-	// ALSO CONTAINS: sequence of tree objects; child pointers; parent pointer
-	// [pointers are ints -- byte location (offset) of each child in the file]
+    private static int maxChildren = 2 * ArgsGenerate.degree;  // 2t
+    private static int maxObjects = maxChildren - 1;           // 2t-1
 
-	// byte offset? which node starts on which byte on the file
-	// location: byte offset of this node in file
+    private boolean isLeaf;     // true if this is a leaf node
+	private int numObjects;     // current number of objects stored in this node
+    private int numChildren;    // current number of children stored in this node
+	private int cacheLocation;  // the location of this node in the cache.
 
-	// pointers are ints b/c byte location of Node in file.
-	private int[] objectSequence; // 2*t - 1 TreeObjects
-	private int[] childPointers; // 2*t child node pointers + 1 parent pointer
-	private int parent; // + 1 parent pointer
+    // pointers are ints. they are the nodeID of the
+    // node in the tree. each node has a unique nodeID.
 
-    public static int size;
+    // 2t-1 max objects in our node
+    private int[] objects = new int[maxObjects];
 
-	// allocate size of node at creation, fixed: full size: 2t - 1
-	public BTreeNode(int degree, int index) {
-        this.index = index;
+    // 2t children of our node
+    private int[] children = new int[maxChildren];
 
-		// x = allocateNode(); // what is this?
-		leaf = true;
-		size = (2 * degree) - 1;
+    // all except root have 1 parent pointer
+    private int parent;
 
-		// n[x] = 0
-		// Disk-write(x);
-		// T.root = x;
-	}
+    // size of this object in bytes: 7 ints, 2 arrays of ints, 1 boolean
+    public static final int SIZE = (8*4) + (maxObjects*4) + (maxChildren*4) + 1;
 
-	public BTreeNode() {
-
-	}
-
-    public int index() {
-	    return index;
+    public BTreeNode() {
+        id = 0;
+        init();
     }
 
-	public boolean leaf() {
-		return leaf;
+	public BTreeNode(int id) {
+        this.id = id;
+        init();
 	}
+
+	private void init() {
+        numObjects = 0;
+        isLeaf = true;
+    }
+
+    /**
+     * Inserts a TreeObject into the list of objects this node contains.
+     * Retuns true if insert was successful, else false.
+     * @param obj TreeObject to insert
+     */
+	public boolean insert(int obj) {
+	    if (isFull())
+	        return false;
+
+        objects[numObjects] = obj;
+        numObjects++;
+        Arrays.sort(objects);
+        return true;
+    }
+
+    public int index() {
+	    return id;
+    }
+	public boolean isLeaf() {
+		return isLeaf;
+	}
+	public void isLeaf(boolean x) {
+        isLeaf = x;
+	}
+	public int numObjects() {
+        return objects.length;
+    }
+    public boolean isFull() {
+	    return objects.length >= maxObjects;
+    }
+    public void setParent(BTreeNode node) {
+	    parent = node.id;
+    }
+    public void setChild(BTreeNode node) {
+	    children[numChildren] = node.id;
+        numChildren++;
+        // Arrays.sort(children);
+    }
+
 }

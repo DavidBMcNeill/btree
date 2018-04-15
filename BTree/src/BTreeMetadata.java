@@ -4,8 +4,8 @@ public class BTreeMetadata {
     public int nodeSize;  // size of a node in bytes
     public int sequenceLength;
 
-    // each int is 4 bytes, longs are 8 bytes
-    public final static int size = 4 + 4 + 4 + 4 + 8;
+    // 3 ints at 4 bytes each
+    public final static int SIZE = 3*4;
 
     public BTreeMetadata(int degree, int sequenceLength, int nodeSize) {
         this.sequenceLength = sequenceLength;

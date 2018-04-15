@@ -26,8 +26,10 @@ public class SearchBTree {
             // this is the interface for the btree file on disk. we will use it to search.
             disk = new BTreeFile();
 
-            // just return an empty node for now, so it compiles
-            return new BTreeNode();
+            // placeholder
+            BTreeNode nodeWeFound = new BTreeNode(666);
+
+            return nodeWeFound;
 
         } catch (IOException e) {
             System.err.printf("problem reading btree file: %s", e);

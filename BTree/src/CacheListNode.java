@@ -5,7 +5,7 @@
  * @author DavidMcNeill
  *
  */
-public class CacheListNode<TreeObject> extends BTreeNode<TreeObject> {
+public class CacheListNode<TreeObject> extends BTreeNode {
 	private TreeObject element;
 	private CacheListNode<TreeObject> next;
 	private CacheListNode<TreeObject> previous;
@@ -28,6 +28,8 @@ public class CacheListNode<TreeObject> extends BTreeNode<TreeObject> {
 	public void setPrevious(CacheListNode<TreeObject> previous) {
 		this.previous = previous;
 	}
+
+
 
 	// BTreeNode that only takes an element as a parameter. Next and previous
 	// are assumed to be null.

@@ -33,7 +33,7 @@ public class ArgsGenerate {
 
     public static boolean useCache;
     public static int degree;
-    public static File geneBankFile;
+    public static String geneBankFile;
     public static int sequenceLength;
     public static int cacheSize;
     public static int debugLevel;
@@ -127,24 +127,12 @@ public class ArgsGenerate {
      * @param s arg to validate as String
      */
     private static void validateGeneBankFile(String s) {
-        File f = new File(s);
-
-        // TODO: validate file ends with ".gbk"
-
-        if (!f.exists())
-            throw new IllegalArgumentException(
-                String.format("invalid geneBankFile. path does not exit: %s", s)
-            );
-        else if (!f.isFile())
-            throw new IllegalArgumentException(
-                String.format("invalid geneBankFile. path is not a file: %s", s)
-            );
-        else if (!f.canRead())
-            throw new IllegalArgumentException(
-                String.format("invalid geneBankFile. cannot read the file: %s", s)
-            );
+        if (s.length() > 0)
+            geneBankFile = s;
         else
-            geneBankFile = f;
+            throw new IllegalArgumentException(
+                "geneBankFile argument cannot be blank"
+            );
     }
 
     /**
