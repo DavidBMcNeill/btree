@@ -53,6 +53,13 @@ public class ArgsSearch {
             if (args.length > 4)
                 validateDebugLevel(args[4]);
 
+            if (debugLevel == 1 && !btreeFile.exists()) {
+                throw new IllegalArgumentException(
+                    "you must specify a btreeFile arg if debug is set to 1"
+                );
+            }
+
+
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             showUsage();
@@ -100,22 +107,7 @@ public class ArgsSearch {
      * @param s arg to validate as String
      */
     private static void validateBtreeFile(String s) {
-        File f = new File(s);
-
-        if (!f.exists())
-            throw new IllegalArgumentException(
-                String.format("invalid btreeFile. path does not exit: %s", s)
-            );
-        else if (!f.isFile())
-            throw new IllegalArgumentException(
-                String.format("invalid btreeFile. path is not a file: %s", s)
-            );
-        else if (!f.canRead())
-            throw new IllegalArgumentException(
-                String.format("invalid btreeFile. cannot read the file: %s", s)
-            );
-        else
-            btreeFile = f;
+        btreeFile = new File(s);
     }
 
     /**

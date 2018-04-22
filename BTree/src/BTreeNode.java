@@ -3,6 +3,7 @@ import java.util.Arrays;
 /**
  * Represents a Node in a BTree.
  */
+
 public class BTreeNode {
 
     // every node gets a unique 0-indexed number in the BTree when it's inserted.
@@ -15,21 +16,23 @@ public class BTreeNode {
     private boolean isLeaf;     // true if this is a leaf node
 	private int numObjects;     // current number of objects stored in this node
     private int numChildren;    // current number of children stored in this node
+
+    // We don't need this if we have the size and the id
 	private int cacheLocation;  // the location of this node in the cache.
 
     // pointers are ints. they are the nodeID of the
     // node in the tree. each node has a unique nodeID.
 
     // 2t-1 max objects in our node
-    private int[] objects = new int[maxObjects];
+    private long[] objects = new long[maxObjects];
 
     // 2t children of our node
-    private int[] children = new int[maxChildren];
+    private long[] children = new long[maxChildren];
 
     // all except root have 1 parent pointer
-    private int parent;
+    private long parent;
 
-    // size of this object in bytes: 7 ints, 2 arrays of ints, 1 boolean
+    // size of this object in bytes: 8 ints, 2 arrays of ints, 1 boolean
     public static final int SIZE = (8*4) + (maxObjects*4) + (maxChildren*4) + 1;
 
     public BTreeNode() {
@@ -41,6 +44,17 @@ public class BTreeNode {
         this.id = id;
         init();
 	}
+
+	// TODO: too many arguments! break this up into methods.
+	public BTreeNode(int id, boolean isLeaf, long parent, int numChildren, int numObjects, long[] objects, long[] children) {
+        this.id = id;
+        this.isLeaf = isLeaf;
+        this.parent = parent;
+        this.numChildren = numChildren;
+        this.numObjects = numObjects;
+        this.objects = objects;
+        this.children = children;
+    }
 
 	private void init() {
         numObjects = 0;
@@ -79,6 +93,18 @@ public class BTreeNode {
     }
     public void setParent(BTreeNode node) {
 	    parent = node.id;
+    }
+    public long getParent() {
+        return parent;
+    }
+    public int numChildren() {
+	    return numChildren;
+    }
+    public long getObject(int index) {
+        return objects[index];
+    }
+    public long getChild(int index) {
+	    return children[index];
     }
     public void setChild(BTreeNode node) {
 	    children[numChildren] = node.id;

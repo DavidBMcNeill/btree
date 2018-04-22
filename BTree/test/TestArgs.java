@@ -7,7 +7,6 @@ public class TestArgs {
         test_validateUseCache_D();
         test_validateUseCache_E();
         test_validateUseCache_F();
-
     }
 
     private void test_validateUseCache_A() {

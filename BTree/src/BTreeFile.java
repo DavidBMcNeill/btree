@@ -1,13 +1,24 @@
+import java.io.RandomAccessFile;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 public class BTreeFile {
 
     private RandomAccessFile file;
     private BTreeMetadata metadata;
-    private File geneBankFile;
 
+    /**
+     * The constructor to use when reading an existing BTree File.
+     * @throws IOException
+     */
+    public BTreeFile(File btreeFile) throws IOException {
+        createAccessFile(btreeFile);
+    }
+
+    /**
+     * Constructor to use when generating a new BTree File.
+     * @throws IOException
+     */
     public BTreeFile() throws IOException {
 
         this.metadata = new BTreeMetadata(
@@ -16,19 +27,32 @@ public class BTreeFile {
             BTreeNode.SIZE
         );
 
-        this.geneBankFile = generateBtreeFilename();
-
-        // "rwd" tells the reader to update the files's content on disk for every update.
-        // this is more efficient and guarantees all modifications have been made.
-        file = new RandomAccessFile(generateBtreeFilename(), "rwd");
+        File f = generateBtreeFile();
+        createAccessFile(f);
+        writeTreeMetadata();
     }
 
-    private File generateBtreeFilename() {
-        return new File(String.format("%s.btree.data.%s.%s",
-            geneBankFile,
+    private void createAccessFile(File f) throws IOException {
+        // "rwd" tells the reader to update the files's content on disk for every update.
+        // this is more efficient and guarantees all modifications have been made.
+        file = new RandomAccessFile(f, "rwd");
+    }
+
+    private File generateBtreeFile() throws IOException {
+
+        String name = String.format("%s.btree.data.%s.%s",
+            ArgsGenerate.geneBankFile.getAbsolutePath(),
             metadata.sequenceLength,
             metadata.degree
-        ));
+        );
+
+        File f = new File(name);
+        if (!f.createNewFile()) {
+            throw new IOException(String.format("couldn't create file: %s", f));
+        }
+
+        return f;
+
     }
 
     /**
@@ -71,22 +95,54 @@ public class BTreeFile {
 
         // start after the btree metadata, then go "index" node "size"s over.
         long spot = BTreeMetadata.SIZE + (node.index() * BTreeNode.SIZE);
-
         file.seek(spot);
 
-        // TODO:  write stuff to the file like so:
-        // file.writeInt(node.stuff);
+//        file.writeInt(node.index());
+        file.writeBoolean(node.isLeaf());
+        file.writeLong(node.getParent());
+        file.writeInt(node.numChildren());
+        file.writeInt(node.numObjects());
+
+        for (int i=0; i<node.numChildren(); i++) {
+            file.writeLong(node.getChild(i));
+        }
+        for (int i=0; i<node.numObjects(); i++) {
+            file.writeLong(node.getObject(i));
+        }
 
         return spot;
     }
 
-     public BTreeNode read() {
-        // TODO: read a node from disk
+     public BTreeNode read(int nodeIndex) throws IOException {
 
-        // placeholder
-        BTreeNode nodeWeFound = new BTreeNode(666);
+        long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
+        file.seek(spot);
 
-        return nodeWeFound;  // or null if not found
+        boolean isLeaf = file.readBoolean();
+        long parent = file.readLong();
+        int numChildren = file.readInt();
+        int numObjects = file.readInt();
+
+        long[] objects = new long[numChildren];
+        for (int i=0; i<numChildren; i++) {
+            objects[i] = file.readLong();
+        }
+
+        long[] children = new long[numObjects];
+        for (int i=0; i<numObjects; i++) {
+            children[i] = file.readLong();
+        }
+
+         // or null if not found?
+        return new BTreeNode(
+            nodeIndex,
+            isLeaf,
+            parent,
+            numChildren,
+            numObjects,
+            objects,
+            children
+        );
     }
 
 }

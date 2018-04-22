@@ -33,7 +33,7 @@ public class ArgsGenerate {
 
     public static boolean useCache;
     public static int degree;
-    public static String geneBankFile;
+    public static File geneBankFile;
     public static int sequenceLength;
     public static int cacheSize;
     public static int debugLevel;
@@ -127,12 +127,17 @@ public class ArgsGenerate {
      * @param s arg to validate as String
      */
     private static void validateGeneBankFile(String s) {
-        if (s.length() > 0)
-            geneBankFile = s;
-        else
+
+        File f = new File(s);
+
+        if (f.exists()) {
+            geneBankFile = f;
+        } else {
             throw new IllegalArgumentException(
-                "geneBankFile argument cannot be blank"
+                String.format("geneBankFile file doesn't exist: %s", s)
             );
+        }
+
     }
 
     /**
