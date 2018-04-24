@@ -15,9 +15,9 @@ public class TreeObject {
 	private int duplicateCount;
 	private long key;
 
-	public TreeObject(long key) {
+	public TreeObject(long key, int duplicateCount) {
 		this.key = key;
-		duplicateCount = 0;
+		this.duplicateCount = duplicateCount;
 	}
 
 	/**
