@@ -33,22 +33,51 @@ public class GeneParser {
 	}
 
 	/**
+	 * a = 00; t = 11; c = 01; g = 10
+	 * @param dnaString
+	 * @return dna string formatted as a long binary number. 
+	 */
+	private long toBinary(String dnaString) {
+		long binary = 0;
+		char[] letters = dnaString.toCharArray();
+		StringBuilder binaryBuild = new StringBuilder();
+		
+		for (char letter : letters) {
+			switch(letter) {
+			case 'a':
+				binaryBuild.append("00");
+			case 't':
+				binaryBuild.append("11");
+			case 'c':
+				binaryBuild.append("01");
+			case 'g':
+				binaryBuild.append("10");
+			default:
+				System.err.println("Invalid dna char input: " + letter);
+			}
+		}
+		binary = Long.parseLong(binaryBuild.toString());
+		return binary;
+	}
+	
+	/**
 	 * writes a text file named 'dump that has following line format:
 	 * <frequency> <DNA string>
 	 */
-	public void parse() {
+	public ArrayList<BTreeObject> parse() {
 
 		String genes = "atcg";
 		String firstScan = "";
 		String sequence = "";
 
 		StringBuilder geneInfo = new StringBuilder();
+		ArrayList<BTreeObject> treeObjects = new ArrayList<BTreeObject>();
 
 		try {
 			Scanner geneScan = new Scanner(new File(file));
 			HashMap<String, Integer> geneCount = new HashMap<String, Integer>();
 
-			PrintWriter dump = new PrintWriter(new File("dump"));
+// 			PrintWriter dump = new PrintWriter(new File("dump"));
 
 			while (geneScan.hasNextLine()) {
 				firstScan = geneScan.nextLine();
@@ -92,9 +121,13 @@ public class GeneParser {
 
 			for (Map.Entry<String, Integer> entry : geneCount.entrySet()) {
 				String dnaString = entry.getKey().toString();
-				int frequency = entry.getValue();
-				System.out.println("<" + frequency + "> " + "<" + dnaString + ">");
-				dump.println("<" + frequency + "> " + "<" + dnaString + ">");
+				long key = toBinary(dnaString);
+				int duplicateCount = entry.getValue();
+				System.out.println("<" + duplicateCount + "> " + "<" + key + ">");
+				
+				treeObjects.add(treeObject);
+				// no longer printing to dump b/c needs to be IN-ORDER TRAVERSAL
+// 				dump.println("<" + frequency + "> " + "<" + dnaString + ">");
 			}
 
 			dump.close();
@@ -104,5 +137,6 @@ public class GeneParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return treeObjects;
 	}
 }
