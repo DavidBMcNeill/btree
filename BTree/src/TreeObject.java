@@ -4,7 +4,7 @@
  * @author DavidMcNeill1
  *
  */
-public class TreeObject {
+public class TreeObject implements Comparable<TreeObject>{
 
 	//long is the key value [use to build search tree property [left < mid < right]
 	
@@ -49,6 +49,9 @@ public class TreeObject {
 	public long getKey() {
 		return key;
 	}
+	public int getFreq() {
+		return duplicateCount;
+	}
 	
 	public void duplicateIncrement() {
 		duplicateCount++;
@@ -57,5 +60,10 @@ public class TreeObject {
 	@Override
 	public String toString() {
 		return "TreeObject [duplicateCount=" + duplicateCount + ", key=" + key + "]";
-	}		
+	}
+
+	@Override
+	public int compareTo(TreeObject o) {		
+		return (int) (key - o.key);
+	}
 }//end TreeObject
