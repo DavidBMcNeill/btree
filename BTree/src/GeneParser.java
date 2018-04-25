@@ -89,7 +89,7 @@ public class GeneParser {
 					}
 				}
 			}
-			System.out.println(geneCount);
+			//System.out.println(geneCount);
 
 			for (Map.Entry<String, Integer> entry : geneCount.entrySet()) {
 				String dnaString = entry.getKey().toString();
