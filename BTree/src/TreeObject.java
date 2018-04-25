@@ -15,9 +15,9 @@ public class TreeObject {
 	private int duplicateCount;
 	private long key;
 
-	public TreeObject(long key) {
+	public TreeObject(long key, int duplicateCount) {
 		this.key = key;
-		duplicateCount = 0;
+		this.duplicateCount = duplicateCount;
 	}
 
 	/**
@@ -52,5 +52,10 @@ public class TreeObject {
 	
 	public void duplicateIncrement() {
 		duplicateCount++;
-	}	
-}
+	}
+
+	@Override
+	public String toString() {
+		return "TreeObject [duplicateCount=" + duplicateCount + ", key=" + key + "]";
+	}		
+}//end TreeObject
