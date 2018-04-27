@@ -71,7 +71,6 @@ public class TreeObject implements Comparable<TreeObject>{
 
 	@Override
 	public int compareTo(TreeObject o) {
-
 		return (int) (key - o.key);
 	}
 

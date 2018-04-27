@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * 
@@ -17,9 +19,31 @@ public class GeneBankCreateBTree {
             return;
         }
 
-        CreateBTree creator = new CreateBTree();
-        if (creator.create())
-            showResults();
+        run();
+        showResults();
+    }
+
+    private static void run() {
+        BTree tree = new BTree();
+        KeyCoder coder = new KeyCoder();
+
+        try {
+
+            GbkReader reader = new GbkReader(
+                    ArgsGenerate.geneBankFile,
+                    ArgsGenerate.sequenceLength
+            );
+
+            while (reader.hasNext()) {
+                String chunk = reader.next();
+                long key = coder.encodeKey(chunk);
+                System.out.printf("%s --> %dl\n", chunk, key);   // <-- PRINTS THE LINE
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+
+        }
     }
 
     private static void showResults() {
