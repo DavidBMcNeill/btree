@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class SearchBTree {
 
-    private BTreeFile disk;
+    private BTreeFile file;
 
     public SearchBTree() {
 
@@ -24,12 +24,9 @@ public class SearchBTree {
 
         try {
             // this is the interface for the btree file on disk. we will use it to search.
-            disk = new BTreeFile();
+            file = new BTreeFile();
 
-            // placeholder
-            BTreeNode nodeWeFound = new BTreeNode(666);
-
-            return nodeWeFound;
+            return new BTreeNode();
 
         } catch (IOException e) {
             System.err.printf("problem reading btree file: %s", e);

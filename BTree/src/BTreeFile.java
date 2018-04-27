@@ -106,20 +106,29 @@ public class BTreeFile {
         try {
 
             // start after the btree metadata, then go "index" node "size"s over.
-            long spot = BTreeMetadata.SIZE + (node.index() * BTreeNode.SIZE);
+            long spot = BTreeMetadata.SIZE + (node.getId() * BTreeNode.SIZE);
             file.seek(spot);
 
             // file.writeInt(node.index());
             file.writeBoolean(node.isLeaf());
-            file.writeLong(node.getParent());
-            file.writeInt(node.numChildren());
-            file.writeInt(node.numObjects());
+            file.writeInt(node.getId());
+            file.writeInt(node.getNumKids());
+            file.writeInt(node.getNumObjects());
 
-            for (int i = 0; i < node.numChildren(); i++) {
-                file.writeLong(node.getChild(i));
+            BTreeNode kid;
+            for (int i = 0; i < node.getNumKids(); i++) {
+                kid = node.getKid(i);
+                file.writeBoolean(kid.isLeaf());
+                file.writeInt(kid.getId());
+                file.writeInt(kid.getNumKids());
+                file.writeInt(kid.getNumObjects());
             }
-            for (int i = 0; i < node.numObjects(); i++) {
-                file.writeLong(node.getObject(i));
+
+            TreeObject obj;
+            for (int i = 0; i < node.getNumObjects(); i++) {
+                obj = node.getObject(i);
+                file.writeLong(obj.getKey());
+                file.writeInt(obj.getFreq());
             }
 
             return spot;
@@ -137,39 +146,77 @@ public class BTreeFile {
      * @return BTreeNode or null
      */
     public BTreeNode read(int nodeIndex) {
+
+
         try {
+            // start after the btree metadata, then go "index" node "size"s over.
             long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
             file.seek(spot);
 
-            boolean isLeaf = file.readBoolean();
-            long parent = file.readLong();
-            int numChildren = file.readInt();
-            int numObjects = file.readInt();
+            BTreeNode node = new BTreeNode();
+            node.setLeaf(file.readBoolean());
+            node.setId(file.readInt());
+            node.setNumKids(file.readInt());
+            node.setNumObjects(file.readInt());
 
-            long[] objects = new long[numChildren];
-            for (int i = 0; i < numChildren; i++) {
-                objects[i] = file.readLong();
+            for (int i = 0; i < node.getNumKids(); i++) {
+                BTreeNode kid = new BTreeNode();
+                kid.setLeaf(file.readBoolean());
+                kid.setId(file.readInt());
+                kid.setNumKids(file.readInt());
+                kid.setNumObjects(file.readInt());
+                node.setKid(i, kid);
             }
 
-            long[] children = new long[numObjects];
-            for (int i = 0; i < numObjects; i++) {
-                children[i] = file.readLong();
+            for (int i = 0; i < node.getNumObjects(); i++) {
+                TreeObject obj = new TreeObject(file.readLong(), file.readInt());
+                node.setObject(i, obj);
             }
 
-            return new BTreeNode(
-                nodeIndex,
-                isLeaf,
-                parent,
-                numChildren,
-                numObjects,
-                objects,
-                children
-            );
+            return node;
 
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.err.printf("cannot read: %s\n", e);
             return null;
         }
     }
+
+//        try {
+//            long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
+//            file.seek(spot);
+//
+//            boolean isLeaf = file.readBoolean();
+//            long parent = file.readLong();
+//            int numChildren = file.readInt();
+//            int numObjects = file.readInt();
+//
+//            long[] objects = new long[numChildren];
+//            for (int i = 0; i < numChildren; i++) {
+//                objects[i] = file.readLong();
+//            }
+//
+//            long[] children = new long[numObjects];
+//            for (int i = 0; i < numObjects; i++) {
+//                children[i] = file.readLong();
+//            }
+//
+//            return new BTreeNode(
+//                nodeIndex,
+//                isLeaf,
+//                parent,
+//                numChildren,
+//                numObjects,
+//                objects,
+//                children
+//            );
+//
+//        } catch(IOException e) {
+//            System.err.printf("cannot read: %s\n", e);
+//            return null;
+//        }
+
+
+
+
 
 }

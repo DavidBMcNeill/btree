@@ -1,99 +1,121 @@
+import java.util.ArrayList;
 
-/**
- * "Project only requires insert method"
- * 
- * @author DavidMcNeill
- *
- */
 public class BTree {
-	
-	private BTreeNode root;
-	private IUDoubleLinkedList list;
-	private int currentNodeID;  // incremented every time a node is inserted
+    private int t;// degree
+    private int maxKeys, nodeCount;
+    private BTreeNode root, y;
+    private BTreeFile file;
+    // exists
 
-	public BTree() {
-        currentNodeID = 0;
-	    list = new IUDoubleLinkedList();
-	    root = new BTreeNode(currentNodeID);
+    public BTree() {
+        t = ArgsGenerate.degree;
+        maxKeys = 2 * t - 1;
+        System.out.println("maxObjects per Node: " + maxKeys);
+        root = y = AllocatNode();// y is child
+        nodeCount = 1;// for root
+        root.setId(nodeCount);
     }
 
-    /**
-     * Insert BTreeNode into the tree.
-     * @param k
-     */
-    public void insert(int k) {
+    public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) {
+        BTreeNode right = new BTreeNode();
+        // currently from list should be from file
+        right.setLeaf(left.isLeaf());
+        right.setNumObjects(t - 1);
 
-        // s : current node you're in.
-        // r : child node.
-
-        /*
-          r = root[T]
-          if (n[r] == 2*t - 1) { //node is full
-            BTreeNode s = allocate-node(); // BTreeNode constructor
-            root[T] = s;
-            leaf[s] = false;
-            n[s] = null;
-            c1[s] = r;
-            split(s, 1, r); // 1 is the index
-            insertNonFull(s, k); // recursive procedure
-          } else { // node isn't full
-            insertNonFull(s, k);
-          }
-         */
-
-        // not sure about k's type yet. should it
-        // be a BTreeNode or an int for the key.
-
-        if (root.isFull()) {
-            currentNodeID++;
-            BTreeNode s = new BTreeNode(currentNodeID);
-            root= s;
-            s.setChild(root);
-            splitChild(s, 1, root);
-            insertNotFull(s, k);
-        } else {
-            insertNotFull(root, k);
+        for (int j = 0; j < t - 1; j++) { // values for j?
+            right.setObject(j, left.getObject(j + 1));
         }
 
+        if (!left.isLeaf()) {
+            for (int j = 0; j < t; j++) {
+                right.setKid(j, left.getKid(j + t));// this too
+            }
+        }
+
+        // left.setNumObjects(t - 1); Unnecessary -- getKid decrements numKids
+        // in node
+
+        for (int j = parent.getNumObjects() + 1; j > leftIndex + 1; j--) {
+            parent.setObject(j + 1, parent.getObject(j));
+        }
+
+        parent.setKid(leftIndex + 1, right);
+
+        for (int j = parent.getNumObjects(); j > leftIndex; j--) {
+            parent.setObject(j + leftIndex, parent.getObject(j));
+        }
+
+        parent.setObject(leftIndex, left.getObject(t - 1));
+
+        // write nodes to disk
+//        file.write(child);  // disk-write(child)
+//        file.write(z);      // disk-write(z)
+//        file.write(x);      // disk-write(x)
     }
 
-    public boolean splitChild(BTreeNode x, int i, BTreeNode y) {
-	    // x = currentNode, i = currentNodeIndex, y = childNode
+    public void insertNonFull(BTreeNode node, TreeObject object) {
 
-		/*
-		 BTreeNode z = allocate-node(); // initialize new node's attributes
-		 leaf[z] = leaf[y];
-		 n[z] = t - 1;
-		 for (int j = 1; j <= t - 1; j++) {
-		   key<j>[z] = key<j+1>[y];
-		 }
-		 if (!leaf[y]) {
-		   for (int j = 1; j <= t; j++) {
-		     c<j>[z] = c<j+1>[y];
-		   }
-		 }
-		 n[y] = t -1;
-		 for (int j = n[x] + 1; j >= i + 1; j--) {
-		    c<j+1>[x] = c<j>[x];
-		 }
-		 c<i+1>[x] = z;
-		 */
+        int numObjects = node.getNumObjects();
+        int index = numObjects - 1;
+        System.out.println("numObjects: " + numObjects);
 
-        // TODO: split child node in the tree
-	    // TODO: get the node index (is this the variable 'i'?
-	    int fakeIndex = 666;
+        if (node.isLeaf()) {
+            // compare new object's key to
+            // previous insert's key
+            while (numObjects > 0 && object.getKey() < node.getObject(index).getKey()) {
+                node.setObject(index + 1, node.getObject(index));
+                index--;
+            }
+            if (index < 0) {
+                node.setObject(0, object);
+            } else {
+                node.setObject(index, object);
+            }
 
-	    BTreeNode z = new BTreeNode(fakeIndex);
-        z.isLeaf(y.isLeaf());
-        z.setParent(x);
+            file.write(node);
 
-        return true;
+//             if (numObjects == 0) {
+//                  node.setObject(0, object);
+//             } else {
+//                  node.setObject(index + 1, object);
+//             }
+        } else {
+            // yeah we'll see
+            while (index > 0 && object.getKey() < node.getObject(index).getKey()) {
+                --index;
+            }
+            index++;
+            // fake diskRead x's child at index i
+            if (node.getKid(index).getNumObjects() == maxKeys) {
+                splitChild(node, index, node.getKid(index));
+                if (object.getKey() > node.getObject(index).getKey()) {
+                    index++;
+                }
+            }
+            // insertNonFull(node.getKid(index), object);
+        }
     }
 
-    public boolean insertNotFull(BTreeNode x, int k) {
-        // TODO: insertNotFull method in BTree
-        return true;
+    public void insert(TreeObject object) {
+        BTreeNode child = root;
+        // System.out.println("r's id: " + r.getId());
+        if (child.getNumObjects() == maxKeys) {
+            BTreeNode parent = new BTreeNode();
+            root = parent;
+            // node.setId(++nodeCount);
+            // System.out.println("root id: " + root.getId());
+            parent.setLeaf(false);
+            parent.setNumObjects(0);
+            parent.setKid(0, child); // addKid now increments numKids;
+            splitChild(parent, 0, child);
+            insertNonFull(parent, object);
+        } else {
+            insertNonFull(child, object);
+        }
     }
 
+    public BTreeNode AllocatNode() {
+        return new BTreeNode();
+    }
 
 }

@@ -127,15 +127,16 @@ public class ArgsGenerate {
      * @param s arg to validate as String
      */
     private static void validateGeneBankFile(String s) {
-        geneBankFile = new File(s);
 
-//        if (f.exists()) {
-//            geneBankFile = f;
-//        } else {
-//            throw new IllegalArgumentException(
-//                String.format("geneBankFile file doesn't exist: %s", s)
-//            );
-//        }
+        File f = new File(s);
+
+        if (f.exists()) {
+            geneBankFile = f;
+        } else {
+            throw new IllegalArgumentException(
+                String.format("geneBankFile file doesn't exist: %s", s)
+            );
+        }
 
     }
 
