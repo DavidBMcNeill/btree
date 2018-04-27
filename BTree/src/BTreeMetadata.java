@@ -13,4 +13,12 @@ public class BTreeMetadata {
         this.nodeSize = nodeSize;
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+            "degree=%d, nodeSize=%d, sequenceLength=%d, SIZE=%d",
+            degree, nodeSize, sequenceLength, SIZE
+        );
+    }
+
 }

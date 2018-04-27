@@ -23,8 +23,8 @@ public class BTreeFile {
 
         this.metadata = new BTreeMetadata(
             ArgsGenerate.degree,
-            ArgsGenerate.sequenceLength,
-            BTreeNode.SIZE
+            BTreeNode.SIZE,
+            ArgsGenerate.sequenceLength
         );
 
         File f = generateBtreeFile();
@@ -40,6 +40,11 @@ public class BTreeFile {
     }
 
     private File generateBtreeFile() throws IOException {
+
+//        System.out.printf("ArgsGenerate.geneBankFile: %s\n", ArgsGenerate.geneBankFile);
+//        System.out.printf("ArgsGenerate.geneBankFile.getAbsolutePath(): %s\n", ArgsGenerate.geneBankFile.getAbsolutePath());
+//        System.out.printf("metadata.sequenceLength: %d\n", metadata.sequenceLength);
+//        System.out.printf("metadata.degree: %d\n", metadata.degree);
 
         String name = String.format("%s.btree.data.%s.%s",
             ArgsGenerate.geneBankFile.getAbsolutePath(),
@@ -73,7 +78,7 @@ public class BTreeFile {
      * Reads the BTree's metadata in the binary btree
      * file, returns the data as a BTreeMetadata class.
      */
-    private BTreeMetadata readTreeMetadata() {
+    public BTreeMetadata readTreeMetadata() {
 
         try {
             file.seek(0);

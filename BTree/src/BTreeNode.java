@@ -111,5 +111,10 @@ public class BTreeNode {
         numChildren++;
         // Arrays.sort(children);
     }
-
+    public long[] getObjects() {
+	    return objects;
+    }
+    public long[] getChildren() {
+	    return children;
+    }
 }
