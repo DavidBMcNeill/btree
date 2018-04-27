@@ -7,7 +7,7 @@ public class BTreeMetadata {
     // 3 ints at 4 bytes each
     public final static int SIZE = 3*4;
 
-    public BTreeMetadata(int degree, int sequenceLength, int nodeSize) {
+    public BTreeMetadata(int degree, int nodeSize, int sequenceLength) {
         this.sequenceLength = sequenceLength;
         this.degree = degree;
         this.nodeSize = nodeSize;

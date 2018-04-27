@@ -22,12 +22,12 @@ import java.util.Scanner;
 public class GeneParser {
 
 	// var for gbk file, read by GeneBankCreateBTree cmd-line arg
-	String file;
+	File file;
 
 	// variable for sequence length; read by GeneBankCreateBTree cmd-line arg
 	int ngram;
 
-	public GeneParser(String file, int ngram) {
+	public GeneParser(File file, int ngram) {
 		this.file = file;
 		this.ngram = ngram;
 	}
@@ -46,7 +46,7 @@ public class GeneParser {
 		ArrayList<TreeObject> treeObjects = new ArrayList<TreeObject>();
 
 		try {
-			Scanner geneScan = new Scanner(new File(file));
+			Scanner geneScan = new Scanner(file);
 			HashMap<String, Integer> geneCount = new HashMap<String, Integer>();
 
 // 			PrintWriter dump = new PrintWriter(new File("dump"));

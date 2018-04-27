@@ -1,5 +1,6 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 
@@ -24,21 +25,21 @@ public class GeneBankCreateBTree {
     }
 
     private static void run() {
-        BTree tree = new BTree();
+
         KeyCoder coder = new KeyCoder();
 
         try {
+            BTree tree = new BTree();
 
-            GbkReader reader = new GbkReader(
-                    ArgsGenerate.geneBankFile,
-                    ArgsGenerate.sequenceLength
+            GeneParser parser = new GeneParser(
+                ArgsGenerate.geneBankFile,
+                ArgsGenerate.sequenceLength
             );
 
-            while (reader.hasNext()) {
-                String chunk = reader.next();
-                long key = coder.encodeKey(chunk);
-                System.out.printf("%s --> %dl\n", chunk, key);   // <-- PRINTS THE LINE
+            for (TreeObject obj : parser.parse()) {
+                System.out.println(obj);   // <-- PRINTS THE LINE
             }
+
 
         } catch (IOException e) {
             System.out.println(e.getMessage());

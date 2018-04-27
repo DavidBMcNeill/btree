@@ -20,37 +20,43 @@ public class GeneBankSearch {
 	// file; use [a, c, t, g], upper- or lower-case
 
     public static void main(String[] args) {
-        if (ArgsSearch.validate(args)) {
-            run();
-            showResults();
-        } else {
+
+        if (!ArgsSearch.validate(args)) {
             System.err.println("our arguments did not validate, quitting...");
         }
-    }
 
-    private static void run() {
-        BTreeNode node;
+        KeyCoder coder = new KeyCoder();
         BufferedReader reader;
-        SearchBTree searcher = new SearchBTree();
 
         try {
             reader = new BufferedReader(
                 new FileReader(ArgsSearch.queryFile)
             );
 
+            // BTreeFile tree = new BTreeFile(ArgsSearch.btreeFile);
+            BTree tree = new BTree(ArgsSearch.btreeFile);
+
             String line;
             while ((line = reader.readLine()) != null) {
-                node = searcher.search(line);  // TODO: parse the pattern from the line
-                doSomethingWithNode(node);     // node is a BTreeNode that has our pattern
+
+                long key = coder.encodeKey(line);
+                BTreeNode node = tree.search(key);
+
+                if (node == null) {
+                    System.out.printf("cannot find node with key %dl\n", key);
+                } else {
+                    System.out.printf("found node: %s\n", node);
+                }
             }
+
         } catch (IOException e) {
             System.err.printf("error searching file: %s", e);
         }
     }
 
-    private static void doSomethingWithNode(BTreeNode node) {
-        // TODO: print the node to the output file (i think)
-    }
+//    private static void doSomethingWithNode(BTreeNode node) {
+//         TODO: print the node to the output file (i think)
+//    }
 
     private static void showResults() {
         // TODO: show results
