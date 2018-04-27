@@ -45,7 +45,7 @@ public class BTreeNode {
         init();
 	}
 
-	// TODO: too many arguments! break this up into methods.
+	// TODO: too many arguments! break this up into methods?
 	public BTreeNode(int id, boolean isLeaf, long parent, int numChildren, int numObjects, long[] objects, long[] children) {
         this.id = id;
         this.isLeaf = isLeaf;

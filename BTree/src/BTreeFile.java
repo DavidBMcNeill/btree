@@ -28,6 +28,7 @@ public class BTreeFile {
         );
 
         File f = generateBtreeFile();
+
         createAccessFile(f);
         writeTreeMetadata();
     }
@@ -50,16 +51,15 @@ public class BTreeFile {
         if (!f.createNewFile()) {
             throw new IOException(String.format("couldn't create file: %s", f));
         }
-
         return f;
 
     }
 
     /**
      * Writes the BTree's metadata to the binary btree file.
-     * @throws IOException
      */
     private void writeTreeMetadata() throws IOException {
+
         // metadata belongs at the beginning of the file
         file.seek(0);
 
@@ -72,77 +72,99 @@ public class BTreeFile {
     /**
      * Reads the BTree's metadata in the binary btree
      * file, returns the data as a BTreeMetadata class.
-     * @throws IOException
      */
-    private BTreeMetadata readTreeMetadata() throws IOException {
-        file.seek(0);
+    private BTreeMetadata readTreeMetadata() {
 
-        // these values must match writeTreeMetadata().
-        return new BTreeMetadata(
-            file.readInt(),  // degree
-            file.readInt(),  // nodeSize
-            file.readInt()   // sequenceLength
-        );
+        try {
+            file.seek(0);
+
+            // these values must match writeTreeMetadata().
+            return new BTreeMetadata(
+                file.readInt(),  // degree
+                file.readInt(),  // nodeSize
+                file.readInt()   // sequenceLength
+            );
+        } catch (IOException e) {
+            System.err.printf("failed to read tree metadata: %s\n", e);
+            return null;
+        }
+
     }
 
     /**
      * Writes a BTreeNode to disk.
      * @param node BTreeNode
-     * @return the offset from 0 in bytes where the node was placed in the file
-     * @throws IOException
+     * @return the offset from 0 in bytes where the node was placed in the file. or -1 if failure.
      */
-    public long write(BTreeNode node) throws IOException {
+    public long write(BTreeNode node) {
 
-        // start after the btree metadata, then go "index" node "size"s over.
-        long spot = BTreeMetadata.SIZE + (node.index() * BTreeNode.SIZE);
-        file.seek(spot);
+        try {
 
-//        file.writeInt(node.index());
-        file.writeBoolean(node.isLeaf());
-        file.writeLong(node.getParent());
-        file.writeInt(node.numChildren());
-        file.writeInt(node.numObjects());
+            // start after the btree metadata, then go "index" node "size"s over.
+            long spot = BTreeMetadata.SIZE + (node.index() * BTreeNode.SIZE);
+            file.seek(spot);
 
-        for (int i=0; i<node.numChildren(); i++) {
-            file.writeLong(node.getChild(i));
+            // file.writeInt(node.index());
+            file.writeBoolean(node.isLeaf());
+            file.writeLong(node.getParent());
+            file.writeInt(node.numChildren());
+            file.writeInt(node.numObjects());
+
+            for (int i = 0; i < node.numChildren(); i++) {
+                file.writeLong(node.getChild(i));
+            }
+            for (int i = 0; i < node.numObjects(); i++) {
+                file.writeLong(node.getObject(i));
+            }
+
+            return spot;
+
+        } catch(IOException e) {
+            System.err.printf("cannot write: %s\n", e);
+            return -1;
         }
-        for (int i=0; i<node.numObjects(); i++) {
-            file.writeLong(node.getObject(i));
-        }
 
-        return spot;
     }
 
-     public BTreeNode read(int nodeIndex) throws IOException {
+    /**
+     * Reads and returns a BTreeNode from the file. Or null if failure.
+     * @param nodeIndex which node to get
+     * @return BTreeNode or null
+     */
+    public BTreeNode read(int nodeIndex) {
+        try {
+            long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
+            file.seek(spot);
 
-        long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
-        file.seek(spot);
+            boolean isLeaf = file.readBoolean();
+            long parent = file.readLong();
+            int numChildren = file.readInt();
+            int numObjects = file.readInt();
 
-        boolean isLeaf = file.readBoolean();
-        long parent = file.readLong();
-        int numChildren = file.readInt();
-        int numObjects = file.readInt();
+            long[] objects = new long[numChildren];
+            for (int i = 0; i < numChildren; i++) {
+                objects[i] = file.readLong();
+            }
 
-        long[] objects = new long[numChildren];
-        for (int i=0; i<numChildren; i++) {
-            objects[i] = file.readLong();
+            long[] children = new long[numObjects];
+            for (int i = 0; i < numObjects; i++) {
+                children[i] = file.readLong();
+            }
+
+            return new BTreeNode(
+                nodeIndex,
+                isLeaf,
+                parent,
+                numChildren,
+                numObjects,
+                objects,
+                children
+            );
+
+        } catch(IOException e) {
+            System.err.printf("cannot read: %s\n", e);
+            return null;
         }
-
-        long[] children = new long[numObjects];
-        for (int i=0; i<numObjects; i++) {
-            children[i] = file.readLong();
-        }
-
-         // or null if not found?
-        return new BTreeNode(
-            nodeIndex,
-            isLeaf,
-            parent,
-            numChildren,
-            numObjects,
-            objects,
-            children
-        );
     }
 
 }
