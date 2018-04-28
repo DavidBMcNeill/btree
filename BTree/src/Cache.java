@@ -14,8 +14,11 @@ public class Cache<BTreeNode> {
 	//if node is kicked out from cache, write to file;
 	//write everything in cache to file at end of simulation
 	private ArrayList<BTreeNode> cache;
+	int sizeLimit;
+	BTreeFile file;
 
 	public Cache(int size) throws IOException {
+		sizeLimit = size;
 		this.cache = new ArrayList<BTreeNode>();
 	}
 
@@ -60,15 +63,19 @@ public class Cache<BTreeNode> {
 	 * @param element
 	 */
 	public void add(BTreeNode node) {
+		if (cache.size() > sizeLimit) {
+			removeLast();
+		}
 		cache.add(node);
 	}
 
 	/**
-	 * Removes the last BTreeNode
+	 * Removes the last BTreeNode in the cache and writes it to disk (Using BTreeFile's write(node) method).
 	 * @return
 	 */
-	public BTreeNode removeLast() {
-		return cache.remove(cache.size()-1);
+	public void removeLast() {
+		BTreeNode last = cache.remove(cache.size()-1)
+		file.write(last);
 	}
 
 	/**
