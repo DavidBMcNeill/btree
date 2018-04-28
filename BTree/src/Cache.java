@@ -89,16 +89,6 @@ public class Cache<BTreeNode> {
 
 	/**
 	 * 
-	 * @param element
-	 */
-	public void bumpUp(BTreeNode element) {
-		int swapIndex = cache.indexOf(element);
-		BTreeNode storage = cache.remove(swapIndex);
-		cache.add(0, storage);
-	}
-	
-	/**
-	 * 
 	 * @return
 	 */
 	public int size() {
