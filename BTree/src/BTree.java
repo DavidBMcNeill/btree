@@ -6,6 +6,8 @@ public class BTree {
     private int maxKeys, nodeCount;
     private BTreeNode root, y;
     private BTreeFile file;
+    boolean useCache; // if user elects to use cache
+	Cache cache;
 
     public BTree() throws IOException {
         t = ArgsGenerate.degree;
@@ -15,6 +17,11 @@ public class BTree {
         nodeCount = 1;// for root
         root.setId(nodeCount);
         file = new BTreeFile();
+        useCache = false;
+		if (ArgsGenerate.useCache) {
+			useCache = true;
+			cache = new Cache(ArgsGenerate.cacheSize);
+		}
     }
 
     public BTree(File f) throws IOException {
@@ -146,6 +153,19 @@ public class BTree {
         nodeCount++;
         return node;
     }
+    
+	/**
+	 * Decides whether to write to cache or write to file. 
+	 * @param node
+	 * @throws IOException
+	 */
+	public void writeNode(BTreeNode node) throws IOException {
+		if (useCache) {
+			cache.add(node);
+		} else {
+			file.write(node);
+		}
+	}
 
     /**
      * Searches the tree for a BtreeNode with a specific key.
