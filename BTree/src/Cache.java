@@ -6,8 +6,6 @@ import java.util.ArrayList;
  * Cache size specified by command-line argument from GeneBankSearch call, and GeneBankCreateBTree call. 
  * 
  * @author DavidMcNeill1
- * @param <T>
- *
  */
 public class Cache {
 
