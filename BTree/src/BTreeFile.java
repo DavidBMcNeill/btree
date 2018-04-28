@@ -181,42 +181,13 @@ public class BTreeFile {
         }
     }
 
-//        try {
-//            long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
-//            file.seek(spot);
-//
-//            boolean isLeaf = file.readBoolean();
-//            long parent = file.readLong();
-//            int numChildren = file.readInt();
-//            int numObjects = file.readInt();
-//
-//            long[] objects = new long[numChildren];
-//            for (int i = 0; i < numChildren; i++) {
-//                objects[i] = file.readLong();
-//            }
-//
-//            long[] children = new long[numObjects];
-//            for (int i = 0; i < numObjects; i++) {
-//                children[i] = file.readLong();
-//            }
-//
-//            return new BTreeNode(
-//                nodeIndex,
-//                isLeaf,
-//                parent,
-//                numChildren,
-//                numObjects,
-//                objects,
-//                children
-//            );
-//
-//        } catch(IOException e) {
-//            System.err.printf("cannot read: %s\n", e);
-//            return null;
-//        }
-
-
-
-
+    public long getFilesize() {
+        try {
+            return file.length();
+        } catch(IOException e) {
+            System.err.printf("cannot get size of btree file: %s", e);
+            return -1L;
+        }
+    }
 
 }

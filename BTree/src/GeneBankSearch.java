@@ -25,21 +25,18 @@ public class GeneBankSearch {
             System.err.println("our arguments did not validate, quitting...");
         }
 
-        KeyCoder coder = new KeyCoder();
-        BufferedReader reader;
-
         try {
-            reader = new BufferedReader(
-                new FileReader(ArgsSearch.queryFile)
-            );
 
-            // BTreeFile tree = new BTreeFile(ArgsSearch.btreeFile);
             BTree tree = new BTree(ArgsSearch.btreeFile);
+            KeyCoder coder = new KeyCoder();
+            QueryReader reader = new QueryReader();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
+            while (reader.hasNext()) {
 
+                String line = reader.next();
                 long key = coder.encodeKey(line);
+//                System.out.printf("string=%s, key=%dl\n", line, key);
+
                 BTreeNode node = tree.search(key);
 
                 if (node == null) {

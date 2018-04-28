@@ -92,7 +92,7 @@ public class BTreeNode {
     }
     @Override
     public String toString() {
-         return "Node [isLeaf=" + isLeaf + ", id=" + id + ", numKeys=" + numObjects + ", keys=" + objects + "]";
+         return "Node [isLeaf=" + isLeaf + ", id=" + id + ", numObjects=" + numObjects + ", objects=" + objects + "]";
     }
 }
 

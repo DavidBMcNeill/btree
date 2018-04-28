@@ -16,7 +16,7 @@ public class QueryReader implements Iterator {
 
     private BufferedReader reader;
     private String currentLine;
-    private boolean hasNext;
+    private boolean hasNext = true;
 
     public QueryReader() {
 
@@ -46,6 +46,12 @@ public class QueryReader implements Iterator {
     private void step() throws IOException {
         currentLine = reader.readLine();
         hasNext = (currentLine != null);
+
+        if (hasNext) {
+            currentLine = currentLine.toLowerCase();
+        }
+
+        // System.out.printf("line: %s, hasNext=%b\n", currentLine, hasNext);
     }
 
     public boolean hasNext() {

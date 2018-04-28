@@ -2,11 +2,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class BTree {
-    private int t;// degree
+    private int t; // degree
     private int maxKeys, nodeCount;
     private BTreeNode root, y;
     private BTreeFile file;
-    // exists
 
     public BTree() throws IOException {
         t = ArgsGenerate.degree;
@@ -19,7 +18,21 @@ public class BTree {
     }
 
     public BTree(File f) throws IOException {
+
         file = new BTreeFile(f);
+        BTreeMetadata md = file.readTreeMetadata();
+        t = md.degree;
+        // t = ArgsGenerate.degree;
+
+        maxKeys = 2 * t - 1;
+        System.out.println("maxObjects per Node: " + maxKeys);
+        root = y = AllocateNode();// y is child
+        nodeCount = 1;// for root
+        root.setId(nodeCount);
+
+    }
+    private void init() {
+
     }
 
     public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) {
@@ -126,7 +139,6 @@ public class BTree {
         return new BTreeNode();
     }
 
-
     /**
      * Searches the tree for a BtreeNode with a specific key.
      * Returns the BTreeNode with the key or null if nothing found.
@@ -139,11 +151,24 @@ public class BTree {
 
     private BTreeNode searcher(BTreeNode node, long key) {
         int i = 0;
-        while (i <= node.getNumObjects() && key > node.getObject(i).getKey()) {
-            i++;
+
+//        System.out.printf("root=%s\n", root);
+//        System.out.printf("node=%s\n", node);
+//        System.out.printf("tree obj=%s\n", node.getObject(i));
+//        System.out.printf("obj key=%d\n", node.getObject(i).getKey());
+
+        System.out.printf("\tsearched node: %s\n", node);
+
+        while (i < node.getNumObjects()) {
+            if (key > node.getObject(i).getKey()) {
+                i++;
+            } else {
+                break;
+            }
         }
-        if (i <= node.getNumObjects() && key ==  node.getObject(i).getKey()) {
-            return node;
+        if (i < node.getNumObjects()) {
+            if (key == node.getObject(i).getKey())
+                return node;
         }
         if (node.isLeaf()) {
             return null;
@@ -165,6 +190,8 @@ public class BTree {
         // inOrder(node.getKid(node.getNumKids()-1));
     }
 
-
+    public BTreeMetadata getMetaData() {
+        return file.readTreeMetadata();
+    }
 
 }
