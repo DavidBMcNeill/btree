@@ -151,8 +151,19 @@ public class BTree {
         return searcher(node.getKid(i), key);
     }
 
-
-
+    /**
+     * Traverse the tree in-order, printing each node that is visited.
+     */
+    public void traverseInOrder() {
+        inOrder(root);
+    }
+    private void inOrder(BTreeNode node) {
+        for (int i=0; i<node.getNumKids(); i++) {
+            inOrder(node.getKid(i));
+            System.out.println(node);
+        }
+        // inOrder(node.getKid(node.getNumKids()-1));
+    }
 
 
 

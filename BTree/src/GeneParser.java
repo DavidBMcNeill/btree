@@ -71,9 +71,7 @@ public class GeneParser {
 				if (geneInfo.length() >= i + ngram) {
 					sequence = geneInfo.substring(i, (i + ngram));
 
-					// checks that sequence only contains 'a'
-					// 't'
-					// 'c' or 'g'
+					// checks that sequence only contains 'a' 't' 'c' or 'g'
 					if (sequence.indexOf('n') == -1) {
 
 						// if substring has already been found,
