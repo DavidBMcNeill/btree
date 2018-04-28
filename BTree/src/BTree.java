@@ -11,7 +11,7 @@ public class BTree {
         t = ArgsGenerate.degree;
         maxKeys = 2 * t - 1;
         System.out.println("maxObjects per Node: " + maxKeys);
-        root = y = AllocateNode();// y is child
+        root = y = allocateNode();// y is child
         nodeCount = 1;// for root
         root.setId(nodeCount);
         file = new BTreeFile();
@@ -26,17 +26,14 @@ public class BTree {
 
         maxKeys = 2 * t - 1;
         System.out.println("maxObjects per Node: " + maxKeys);
-        root = y = AllocateNode();// y is child
+        root = y = allocateNode();// y is child
         nodeCount = 1;// for root
-        root.setId(nodeCount);
-
-    }
-    private void init() {
+        root.setId(nodeCount-1);
 
     }
 
     public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) {
-        BTreeNode right = new BTreeNode();
+        BTreeNode right = allocateNode();
         // currently from list should be from file
         right.setLeaf(left.isLeaf());
         right.setNumObjects(t - 1);
@@ -76,7 +73,9 @@ public class BTree {
 
         int numObjects = node.getNumObjects();
         int index = numObjects - 1;
-        System.out.println("numObjects: " + numObjects);
+
+//        System.out.println("numObjects: " + numObjects);
+
 
         if (node.isLeaf()) {
             // compare new object's key to
@@ -116,10 +115,15 @@ public class BTree {
     }
 
     public void insert(TreeObject object) {
+
+        System.out.printf("inserting into tree: %s, tree objects=%d\n", object, nodeCount);
+
+        nodeCount++;
+
         BTreeNode child = root;
         // System.out.println("r's id: " + r.getId());
         if (child.getNumObjects() == maxKeys) {
-            BTreeNode parent = new BTreeNode();
+            BTreeNode parent = allocateNode();
             root = parent;
             // node.setId(++nodeCount);
             // System.out.println("root id: " + root.getId());
@@ -133,10 +137,14 @@ public class BTree {
         } else {
             insertNonFull(child, object);
         }
+
     }
 
-    public BTreeNode AllocateNode() {
-        return new BTreeNode();
+    public BTreeNode allocateNode() {
+        BTreeNode node = new BTreeNode();
+        node.setId(nodeCount);
+        nodeCount++;
+        return node;
     }
 
     /**

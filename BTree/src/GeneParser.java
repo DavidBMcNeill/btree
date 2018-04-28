@@ -22,14 +22,14 @@ import java.util.Scanner;
 public class GeneParser {
 
 	// var for gbk file, read by GeneBankCreateBTree cmd-line arg
-	File file;
+	private File file;
 
 	// variable for sequence length; read by GeneBankCreateBTree cmd-line arg
-	int ngram;
+	private int ngram;
 
-	public GeneParser(File file, int ngram) {
-		this.file = file;
-		this.ngram = ngram;
+	public GeneParser() {
+		this.file = ArgsGenerate.geneBankFile;
+		this.ngram = ArgsGenerate.sequenceLength;
 	}
 	
 	/**

@@ -33,10 +33,7 @@ public class GeneBankSearch {
 
             while (reader.hasNext()) {
 
-                String line = reader.next();
-                long key = coder.encodeKey(line);
-//                System.out.printf("string=%s, key=%dl\n", line, key);
-
+                long key = coder.encodeKey(reader.next());
                 BTreeNode node = tree.search(key);
 
                 if (node == null) {
@@ -51,17 +48,13 @@ public class GeneBankSearch {
         }
     }
 
-//    private static void doSomethingWithNode(BTreeNode node) {
-//         TODO: print the node to the output file (i think)
-//    }
-
     private static void showResults() {
         // TODO: show results
         if (ArgsGenerate.debugLevel == 0) {
             // something
         } else {
             // This file has no 1 level debug required,
-            // though we could implement one if we want.
+            // though we could 'implement one if we want'.
         }
     }
 

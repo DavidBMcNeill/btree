@@ -26,24 +26,18 @@ public class GeneBankCreateBTree {
 
     private static void run() {
 
-        KeyCoder coder = new KeyCoder();
-
         try {
             BTree tree = new BTree();
-
-            GeneParser parser = new GeneParser(
-                ArgsGenerate.geneBankFile,
-                ArgsGenerate.sequenceLength
-            );
+            // KeyCoder coder = new KeyCoder();
+            GeneParser parser = new GeneParser();
 
             for (TreeObject obj : parser.parse()) {
                 System.out.println(obj);   // <-- PRINTS THE LINE
+                tree.insert(obj);
             }
 
-
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-
+            System.out.printf("cannot build tree: %s\n", e);
         }
     }
 
