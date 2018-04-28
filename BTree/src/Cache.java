@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * @param <T>
  *
  */
-public class Cache<BTreeNode> {
+public class Cache {
 
 	//if node is kicked out from cache, write to file;
 	//write everything in cache to file at end of simulation
