@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Cache implementing a doubly-linked list of BTreeNodes to improve BTree runtime.  
@@ -8,39 +9,19 @@ import java.io.IOException;
  * @param <T>
  *
  */
-public class Cache<T> {
+public class Cache<BTreeNode> {
 
 	//if node is kicked out from cache, write to file;
-
 	//write everything in cache to file at end of simulation
-
-	
-	private IUDoubleLinkedList<T> cache;
-	private int nr1 = 0;
-	private int nh1 = 0;
-	private int nh2 = 0;
-	private int nr2 = 0;
-	private int nr = 0;
-	private int nh = 0;
-	private double hr;
-	private double hr1;
-	private double hr2;
+	private ArrayList<BTreeNode> cache;
 
 	public Cache(int size) throws IOException {
-		
-		this.cache = new IUDoubleLinkedList<T>();
-
+		this.cache = new ArrayList<BTreeNode>();
 	}
 
 	/*
-	 * 1) if 1st-level cache hit, +both cache have hit data item. +move hit data
-	 * item to top on both cache
-	 * 
-	 * 2) if 1st-level miss AND 2nd-level hit, +move data item to top of 2nd-level
-	 * cache; +add item to top of 1st-level cache
-	 * 
-	 * 3) if 1st-level miss, 2nd-level miss, +retrieve data item from disk +add item
-	 * to top of both cache
+	 * 1) if cache hit, +move hit data
+	 * item to top of cache
 	 */
 
 	/**
@@ -48,8 +29,8 @@ public class Cache<T> {
 	 * @param element
 	 * @return
 	 */
-	public T getObject(T element) {
-		T getElement = null; 
+	public BTreeNode getObject(BTreeNode element) {
+		BTreeNode getElement = null; 
 		
 		if (cache.indexOf(element) > -1) {
 			int elementIndex = cache.indexOf(element);
@@ -64,7 +45,7 @@ public class Cache<T> {
 	 * @param element
 	 * @return
 	 */
-	public boolean contains(T element) {
+	public boolean contains(BTreeNode element) {
 		boolean contains = false;
 		
 		if (cache.indexOf(element) > -1) {
@@ -78,16 +59,16 @@ public class Cache<T> {
 	 * 
 	 * @param element
 	 */
-	public void addObject(T element) {
-		cache.addToFront(element);
+	public void add(BTreeNode node) {
+		cache.add(node);
 	}
 
 	/**
-	 * 
+	 * Removes the last BTreeNode
 	 * @return
 	 */
-	public T removeObject() {
-		return cache.removeLast();
+	public BTreeNode removeLast() {
+		return cache.remove(cache.size()-1);
 	}
 
 	/**
@@ -95,7 +76,7 @@ public class Cache<T> {
 	 */
 	public void clearCache() {
 		while (!cache.isEmpty()) {
-			removeObject();
+			removeLast();
 		}
 	}
 
@@ -103,10 +84,10 @@ public class Cache<T> {
 	 * 
 	 * @param element
 	 */
-	public void bumpUp(T element) {
+	public void bumpUp(BTreeNode element) {
 		int swapIndex = cache.indexOf(element);
-		T storage = cache.remove(swapIndex);
-		cache.addToFront(storage);
+		BTreeNode storage = cache.remove(swapIndex);
+		cache.add(0, storage);
 	}
 	
 	/**
@@ -117,5 +98,4 @@ public class Cache<T> {
 		int size = cache.size();
 		return size;
 	}
-
 }
