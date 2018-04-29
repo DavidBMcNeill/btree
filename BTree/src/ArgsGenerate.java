@@ -53,8 +53,11 @@ public class ArgsGenerate {
             validateGeneBankFile(args[2]);
             validateSequenceLength(args[3]);
 
-            if (args.length > 4)
-                validateCacheSize(args[4]);
+            if (args.length == 4 && Integer.parseInt(args[0]) == 1) {
+            	validateCacheSize(args[4]);            	
+            }else {
+            	validateDebugLevel(args[4]);
+            }
 
             if (args.length > 5)
                 validateDebugLevel(args[5]);
