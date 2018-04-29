@@ -1,4 +1,5 @@
 
+
 import java.util.ArrayList;
 //import java.util.Arrays;
 //import java.util.LinkedList;
@@ -59,13 +60,18 @@ public class BTreeNode {
     }
 
     public int getNumKids() {
-        return kids.size();
+        return numKids;
     }
     public void setNumKids(int num) {
         numKids = num;
     }
+    
     public TreeObject getObject(int index) {
-//		numObjects--;
+		numObjects--;
+        return objects.remove(index);
+    }
+    
+    public TreeObject peekObject(int index) {
         return objects.get(index);
     }
 
@@ -79,8 +85,13 @@ public class BTreeNode {
     public void setParent(BTreeNode node) {
         parent = node;
     }
+    
     public BTreeNode getKid(int index) {
-//		numKids--;
+		numKids--;
+        return kids.remove(index);
+    }
+    
+    public BTreeNode peekKid(int index) {
         return kids.get(index);
     }
 
@@ -90,9 +101,6 @@ public class BTreeNode {
     }
     @Override
     public String toString() {
-        return String.format(
-            "<Node: id=%d, leaf=%b, objects=%d, kids=%d>",
-            id, isLeaf, objects.size(), kids.size()
-        );
+        return String.format("<Node: id=%d, leaf=%b, objects=%d>", id, isLeaf, objects.size());
     }
 }
