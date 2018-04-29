@@ -66,7 +66,9 @@ public class TreeObject implements Comparable<TreeObject>{
 
 	@Override
 	public String toString() {
-		return "TreeObject [duplicateCount=" + duplicateCount + ", key=" + key + "]";
+		// return "TreeObject [duplicateCount=" + duplicateCount + ", key=" + key + "]";
+        String s = new KeyCoder().decodeKey(key, ArgsGenerate.sequenceLength);
+		return String.format("<TreeObject  duplicates=%d, key=%d, sequence=%s>", duplicateCount, key, s);
 	}
 
 	@Override

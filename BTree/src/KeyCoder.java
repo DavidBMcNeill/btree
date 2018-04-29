@@ -78,7 +78,7 @@ public class KeyCoder {
 	 *            bits from decodeKey
 	 * @return letter representation
 	 */
-	private String decode(long baseFour) {
+	public String decode(long baseFour) {
 		if (baseFour == 0b00) {
 			return "a";
 		} else if (baseFour == 0b11) {

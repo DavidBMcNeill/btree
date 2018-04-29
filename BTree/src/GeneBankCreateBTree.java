@@ -31,7 +31,7 @@ public class GeneBankCreateBTree {
 		// status message
 		System.err.printf("Building B-tree from DNA sequences in %s ...\n", ArgsGenerate.fileName);		
 		GeneParser parser = new GeneParser();
-		objs = parser.parse();		
+		objs = parser.parse();
 		Collections.sort(objs);
 
 		try {
@@ -42,14 +42,14 @@ public class GeneBankCreateBTree {
 
 		} catch (IOException e) {
 			System.err.printf("cannot build tree: %s\n", e);
-		}	
-		
+		}
+
 		double duration = (System.currentTimeMillis() - startTime) * .001;
 		String pattern = "#.00";
-		DecimalFormat df = new DecimalFormat(pattern);		
+		DecimalFormat df = new DecimalFormat(pattern);
 		System.err.printf("Btree from %s has been completed.\nIt took approximately %s seconds to build the tree.",
-            ArgsGenerate.fileName, df.format(duration));	
-		
+            ArgsGenerate.fileName, df.format(duration));
+
 		if(ArgsGenerate.debugLevel == 1) {
 			System.err.println("\nWriting dump file ...");
 			dump();
@@ -61,17 +61,17 @@ public class GeneBankCreateBTree {
 		String title = "dump";
 		KeyCoder kc = new KeyCoder();
 		PrintWriter dumpWriter = null;
-		
+
 		try {
 			dumpWriter = new PrintWriter(title);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		
-		for(TreeObject to : objs) {			
+
+		for(TreeObject to : objs) {
 			dumpWriter.printf("<%s> <%d>\n", kc.decodeKey(to.getKey(), ArgsGenerate.sequenceLength), to.getFreq());
 		}
-		
+
 		dumpWriter.close();
 		System.err.println("dump was successfully written.");
 	}

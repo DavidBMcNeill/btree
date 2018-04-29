@@ -2,8 +2,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class BTree {
+
     private int t; // degree
-    private int maxKeys;
+    private int maxKeys, maxObjs;
     private static int nodeCount = 0;
     private BTreeNode root;
     private BTreeFile file;
@@ -12,6 +13,7 @@ public class BTree {
 
     public BTree() throws IOException {
         t = ArgsGenerate.degree;
+        maxObjs = t - 1;
         maxKeys = 2 * t - 1;
         root = allocateNode();
         file = new BTreeFile();
@@ -33,107 +35,145 @@ public class BTree {
         root = allocateNode();  // y is child
     }
 
-    public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) {
-        BTreeNode right = allocateNode();
-        right.setLeaf(left.isLeaf());
-        right.setNumObjects(t - 1);
+//    public void splitChild2(BTreeNode parent, int leftIndex, BTreeNode left) {
+//        BTreeNode right = allocateNode();
+//        right.setLeaf(left.isLeaf());
+//        right.setNumObjects(t - 1);
+//
+//        for (int j = 0; j < t - 1; j++) { // values for j?
+//            right.setObject(j, left.getObject(j + 1));
+//        }
+//
+//        if (!left.isLeaf()) {
+//            for (int j = 0; j < t; j++) {
+//                right.setKid(j, left.getKid(j + t));// this too
+//            }
+//        }
+//
+//        // left.setNumObjects(t - 1); Unnecessary -- getKid decrements numKids
+//        // in node
+//
+//        for (int j = parent.getNumObjects() + 1; j > leftIndex + 1; j--) {
+//            parent.setObject(j + 1, parent.getObject(j));
+//        }
+//
+//        parent.setKid(leftIndex + 1, right);
+//
+//        for (int j = parent.getNumObjects(); j > leftIndex; j--) {
+//            parent.setObject(j + leftIndex, parent.getObject(j));
+//        }
+//
+//        parent.setObject(leftIndex, left.getObject(t - 1));
+//
+//        // write nodes to disk
+//        file.write(right);
+//        file.write(left);
+//        file.write(parent);
+//    }
 
-        for (int j = 0; j < t - 1; j++) { // values for j?
-            right.setObject(j, left.getObject(j + 1));
+    public void splitChild(BTreeNode x, int i) {
+//        System.out.printf("splitChild: time to split a node, new node: %s\n", x);
+//        System.out.printf("our tree currently has %d node(s)\n", nodeCount);
+        BTreeNode z = allocateNode();
+        BTreeNode y = x.getKid(i);
+        z.setLeaf(y.isLeaf());
+        z.setNumObjects(maxObjs);
+
+        for (int j=0; j<maxObjs; j++) {
+            z.setObject(j, y.getObject(j+t));
         }
 
-        if (!left.isLeaf()) {
-            for (int j = 0; j < t; j++) {
-                right.setKid(j, left.getKid(j + t));// this too
+        if (!y.isLeaf()) {
+            for (int j=0; j<=t; j++) {
+                // System.out.printf("j=%d, t=%d, y.numKids=%d\n", j, t, y.getNumKids());
+                z.setKid(j, y.getKid(j+t));
             }
         }
 
-        // left.setNumObjects(t - 1); Unnecessary -- getKid decrements numKids
-        // in node
-
-        for (int j = parent.getNumObjects() + 1; j > leftIndex + 1; j--) {
-            parent.setObject(j + 1, parent.getObject(j));
+        y.setNumObjects(maxObjs);
+        for (int j=x.getNumObjects(); j>i; i--) {
+            x.setObject(j+1, x.getObject(j));
         }
 
-        parent.setKid(leftIndex + 1, right);
+        x.setObject(i, y.getObject(t));
+        x.setNumObjects(x.getNumObjects()+1);
 
-        for (int j = parent.getNumObjects(); j > leftIndex; j--) {
-            parent.setObject(j + leftIndex, parent.getObject(j));
-        }
+        file.write(y);
+        file.write(z);
+        file.write(x);
+//        System.out.println("split that node successfully");
+//        System.out.printf("tree now has %d node(s)\n", nodeCount);
 
-        parent.setObject(leftIndex, left.getObject(t - 1));
-
-        // write nodes to disk
-        file.write(right);
-        file.write(left);
-        file.write(parent);
     }
 
-    public void insertNonFull(BTreeNode node, TreeObject object) {
+    public void insertNonFull(BTreeNode x, TreeObject k) {
+//        System.out.println("INSERT NON FULL");
 
-        int i = node.getNumObjects()-1;
+        int i = x.getNumObjects()-1;
 
-        if (node.isLeaf()) {
-            while (i >= 1 && object.getKey() < node.getId()) {
-                node.setObject(i+1, node.getObject(i));
+        if (x.isLeaf()) {
+//            System.out.println("we are going to insert an object into a leaf node");
+
+            while (i >= 1 && k.getKey() < x.getId()) {
+                x.setObject(i+1, x.getObject(i));
                 i--;
             }
-            node.setObject(i+1, object);
-            node.setNumObjects(i+1);
-            System.out.printf("WRITING: %s, nodeCount=%d\n", node, nodeCount); // <-- PRINTS THE LINE
-            file.write(node);
+            // System.out.printf("insertNonFull: i=%d\n", i);
+
+            x.setObject(i+1, k);
+            x.setNumObjects(i+1);
+            // System.out.printf("  WRITING: %s, nodeCount=%d\n", x, nodeCount);
+            file.write(x);
 
         } else {
-            while (i >= 1 && object.getKey() < node.getObject(i).getKey()) {
+//            System.out.println("we are going to insert an object into a non-leaf node");
+
+            // System.out.println("insertNonFull: x is a leaf");
+            while (i >= 1 && k.getKey() < x.getObject(i).getKey()) {
                 i--;
             }
+//            System.out.printf("insertNonFull: i=%d\n", i);
 
             i++;
             BTreeNode n = file.read(i);
+//            System.out.printf("insertNonFull: n=%s\n", n);
 
             if (n.getNumKids() == maxKeys) {
-                splitChild(node, i, node.getKid(i));
-                if (object.getKey() > node.getObject(i).getKey()) {
+                splitChild(x, i);
+                if (k.getKey() > x.getObject(i).getKey()) {
                     i++;
                 }
             }
 
-            insertNonFull(node.getKid(i), object);
+//            System.out.printf("insertNonFull: i=%d\n", i);
+            insertNonFull(x.getKid(i-1), k);
         }
     }
 
-    public void insert(TreeObject object) {
+    public void insert(TreeObject k) {
+//        System.out.printf("INSERTING: %s\n", k);
+        BTreeNode r = root;
 
-        System.out.printf("inserting %s\n", object);
+        if (r.getNumObjects() >= maxKeys) {
+//            System.out.println("insert: root node is full");
+            BTreeNode s = allocateNode();
+            root = s;
+            s.setLeaf(false);
+            s.setNumObjects(0);
+            s.setKid(0, r);
 
-        //nodeCount++;
-
-//        BTreeNode child = allocateNode();
-//        child = root;
-        BTreeNode child = root;
-
-        // System.out.println("r's id: " + r.getId());
-        if (child.getNumObjects() == maxKeys) {
-            BTreeNode parent = allocateNode();
-            root = parent;
-            // node.setId(++nodeCount);
-            // System.out.println("root id: " + root.getId());
-
-            parent.setLeaf(false);
-            parent.setNumObjects(0);
-            parent.setKid(0, child); // addKid now increments numKids;
-
-            splitChild(parent, 0, child);
-            insertNonFull(parent, object);
+            splitChild(s, 0);
+            insertNonFull(s, k);
 
         } else {
-            insertNonFull(child, object);
+//            System.out.println("insert: root node is not full");
+            insertNonFull(r, k);
         }
 
     }
 
     public static BTreeNode allocateNode() {
-        System.out.printf("allocating new node. nodeCount=%d\n", nodeCount);
+//        System.out.printf("allocating new node. nodeCount=%d\n", nodeCount);
 
         nodeCount++;
         BTreeNode node = new BTreeNode();
@@ -172,7 +212,7 @@ public class BTree {
 //        System.out.printf("tree obj=%s\n", node.getObject(i));
 //        System.out.printf("obj key=%d\n", node.getObject(i).getKey());
 
-        System.out.printf("\tsearched node: %s\n", node);
+//        System.out.printf("\tsearched node: %s\n", node);
 
         while (i < node.getNumObjects()) {
             if (key > node.getObject(i).getKey()) {
@@ -195,7 +235,9 @@ public class BTree {
      * Traverse the tree in-order, printing each node that is visited.
      */
     public void traverseInOrder() {
+        System.out.println("-----------------------");
         inOrder(root);
+        System.out.println("-----------------------");
     }
 
     private void inOrder(BTreeNode node) {

@@ -59,7 +59,7 @@ public class BTreeNode {
     }
 
     public int getNumKids() {
-        return numKids;
+        return kids.size();
     }
     public void setNumKids(int num) {
         numKids = num;
@@ -90,6 +90,6 @@ public class BTreeNode {
     }
     @Override
     public String toString() {
-        return String.format("<Node: id=%d, leaf=%b, objects=%d>", id, isLeaf, objects.size());
+        return String.format("<Node: id=%d, leaf=%b, objects=%d, kids=%d>", id, isLeaf, objects.size(), kids.size());
     }
 }

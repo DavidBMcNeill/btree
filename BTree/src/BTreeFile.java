@@ -115,8 +115,8 @@ public class BTreeFile {
     public long write(BTreeNode node) {
 
         try {
-
             // start after the btree metadata, then go "index" node "size"s over.
+            System.out.printf("writing node to disk:  %s\n", node);
             long spot = BTreeMetadata.SIZE + (node.getId() * BTreeNode.SIZE);
             file.seek(spot);
 
@@ -182,7 +182,7 @@ public class BTreeFile {
                 TreeObject obj = new TreeObject(file.readLong(), file.readInt());
                 node.setObject(i, obj);
             }
-
+            System.out.printf(" read node from disk:  %s\n", node);
             return node;
 
         } catch (IOException e) {
