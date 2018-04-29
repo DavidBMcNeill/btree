@@ -90,6 +90,9 @@ public class BTreeNode {
     }
     @Override
     public String toString() {
-        return String.format("<Node: id=%d, leaf=%b, objects=%d, kids=%d>", id, isLeaf, objects.size(), kids.size());
+        return String.format(
+            "<Node: id=%d, leaf=%b, objects=%d, kids=%d>",
+            id, isLeaf, objects.size(), kids.size()
+        );
     }
 }

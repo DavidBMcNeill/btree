@@ -21,7 +21,7 @@ public class BTree {
 
 		if (ArgsGenerate.useCache) {
 			useCache = true;
-			cache = new Cache(ArgsGenerate.cacheSize);
+			cache = new Cache(ArgsGenerate.cacheSize, file);
 		}
     }
 
@@ -35,10 +35,11 @@ public class BTree {
         root = allocateNode();  // y is child
     }
 
-    public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) {
-        BTreeNode right = allocateNode();
-        right.setLeaf(left.isLeaf());
-        right.setNumObjects(t - 1);
+    public void splitChild(BTreeNode x, int i) {
+        BTreeNode z = allocateNode();
+        BTreeNode y = x.getKid(i);
+        z.setLeaf(y.isLeaf());
+        z.setNumObjects(t - 1);
 
         for (int j=0; j<maxObjs; j++) {
             z.setObject(j, y.getObject(j+t));
@@ -59,9 +60,9 @@ public class BTree {
         x.setObject(i, y.getObject(t));
         x.setNumObjects(x.getNumObjects()+1);
 
-        file.write(y);
-        file.write(z);
-        file.write(x);
+        writeNode(y);
+        writeNode(z);
+        writeNode(x);
 //        System.out.println("split that node successfully");
 //        System.out.printf("tree now has %d node(s)\n", nodeCount);
 
@@ -88,7 +89,6 @@ public class BTree {
 
         } else {
 //            System.out.println("we are going to insert an object into a non-leaf node");
-
             // System.out.println("insertNonFull: x is a leaf");
             while (i >= 1 && k.getKey() < x.getObject(i).getKey()) {
                 i--;
@@ -116,12 +116,15 @@ public class BTree {
         BTreeNode r = root;
 
         if (r.getNumObjects() >= maxKeys) {
-//            System.out.println("insert: root node is full");
+
+            System.out.println("insert: root node is full");
             BTreeNode s = allocateNode();
             root = s;
+
             s.setLeaf(false);
             s.setNumObjects(0);
             s.setKid(0, r);
+            System.out.printf("root is now %s\n", s);
 
             splitChild(s, 0);
             insertNonFull(s, k);
@@ -146,9 +149,8 @@ public class BTree {
 	 * Decides whether to write to cache or write to file.
 	 *
 	 * @param node
-	 * @throws IOException
 	 */
-	public void writeNode(BTreeNode node) throws IOException {
+	public void writeNode(BTreeNode node) {
 		if (useCache) {
 			if (cache.indexOf(node) == -1) {
 				cache.add(node);
@@ -161,8 +163,8 @@ public class BTree {
 	/**
 	 *
 	 */
-	public BTreeNode readNode(int nodeIndex) throws IOException {
-		BTreeNode retrievedNode = null;
+	public BTreeNode readNode(int nodeIndex) {
+		BTreeNode retrievedNode;
 		if (useCache) {
 			retrievedNode = cache.getNode(nodeIndex);
 		} else {
@@ -220,16 +222,17 @@ public class BTree {
      * Traverse the tree in-order, printing each node that is visited.
      */
     public void traverseInOrder() {
-        System.out.println("-----------------------");
+        System.out.println("------- NODES IN TREE ---------");
         inOrder(root);
-        System.out.println("-----------------------");
+        System.out.println("-------------------------------");
     }
 
     private void inOrder(BTreeNode node) {
         for (int i=0; i<node.getNumKids(); i++) {
             inOrder(node.getKid(i));
-            System.out.println(node);
+//            System.out.println(node);
         }
+        System.out.println(node);
         // inOrder(node.getKid(node.getNumKids()-1));
     }
 

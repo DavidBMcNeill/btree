@@ -28,7 +28,6 @@ public class BTreeFile {
         );
 
         File f = generateBtreeFile();
-
         createAccessFile(f);
         writeTreeMetadata();
     }

@@ -38,6 +38,7 @@ public class GeneBankCreateBTree {
 			BTree tree = new BTree();
 			for (TreeObject obj : objs) {
 				tree.insert(obj);
+				tree.traverseInOrder();
 			}
 
 		} catch (IOException e) {
