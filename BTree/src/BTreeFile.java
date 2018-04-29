@@ -53,6 +53,17 @@ public class BTreeFile {
         );
 
         File f = new File(name);
+
+        // TODO: remove when complete or keep?
+        if (f.exists()) {
+            System.out.println("old btree file exists, overwriting...");
+            if (f.delete()) {
+                System.out.println("deleted old btree file successfully");
+            } else {
+                System.err.println("couldn't delete old btree file");
+            }
+        }
+
         if (!f.createNewFile()) {
             throw new IOException(String.format("couldn't create file: %s", f));
         }
@@ -107,7 +118,6 @@ public class BTreeFile {
 
             // start after the btree metadata, then go "index" node "size"s over.
             long spot = BTreeMetadata.SIZE + (node.getId() * BTreeNode.SIZE);
-            System.out.println(node.getId());
             file.seek(spot);
 
             // file.writeInt(node.index());

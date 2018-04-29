@@ -4,8 +4,8 @@ import java.io.IOException;
 public class BTree {
     private int t; // degree
     private int maxKeys;
-    private static int nodeCount;
-    private BTreeNode root, y;
+    private static int nodeCount = 0;
+    private BTreeNode root;
     private BTreeFile file;
     private boolean useCache; // if user elects to use cache
 	private Cache cache;
@@ -27,16 +27,14 @@ public class BTree {
         file = new BTreeFile(f);
         BTreeMetadata md = file.readTreeMetadata();
 
-        System.out.println(md);
+        //System.out.println(md);
         t = md.degree;
         maxKeys = 2 * t - 1;
         root = allocateNode();  // y is child
-
     }
 
     public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) {
         BTreeNode right = allocateNode();
-        // currently from list should be from file
         right.setLeaf(left.isLeaf());
         right.setNumObjects(t - 1);
 
@@ -66,9 +64,9 @@ public class BTree {
         parent.setObject(leftIndex, left.getObject(t - 1));
 
         // write nodes to disk
-        file.write(right);  // disk-write(child)
-        file.write(left);      // disk-write(z)
-        file.write(parent);      // disk-write(x)
+        file.write(right);
+        file.write(left);
+        file.write(parent);
     }
 
     public void insertNonFull(BTreeNode node, TreeObject object) {
@@ -103,59 +101,16 @@ public class BTree {
         }
     }
 
-    public void insertNonFull2(BTreeNode node, TreeObject object) {
-
-        int numObjects = node.getNumObjects();
-        int index = numObjects - 1;
-
-//        System.out.println("numObjects: " + numObjects);
-
-
-        if (node.isLeaf()) {
-            // compare new object's key to
-            // previous insert's key
-            while (numObjects > 0 && object.getKey() < node.getObject(index).getKey()) {
-                node.setObject(index + 1, node.getObject(index));
-                index--;
-            }
-            if (index < 0) {
-                node.setObject(0, object);
-            } else {
-                node.setObject(index, object);
-            }
-
-            long id = file.write(node);
-            System.out.printf("wrote at file location: %d\n", id);
-
-//             if (numObjects == 0) {
-//                  node.setObject(0, object);
-//             } else {
-//                  node.setObject(index + 1, object);
-//             }
-        } else {
-            // yeah we'll see
-            while (index > 0 && object.getKey() < node.getObject(index).getKey()) {
-                --index;
-            }
-            index++;
-            // fake diskRead x's child at index i
-            if (node.getKid(index).getNumObjects() == maxKeys) {
-                splitChild(node, index, node.getKid(index));
-                if (object.getKey() > node.getObject(index).getKey()) {
-                    index++;
-                }
-            }
-            // insertNonFull(node.getKid(index), object);
-        }
-    }
-
     public void insert(TreeObject object) {
 
-        System.out.printf("inserting into tree: %s, tree objects=%d\n", object, nodeCount);
+//        System.out.printf("inserting into tree: %s, tree objects=%d\n", object, nodeCount);
 
-        nodeCount++;
+        // nodeCount++;
 
+//        BTreeNode child = allocateNode();
+//        child = root;
         BTreeNode child = root;
+
         // System.out.println("r's id: " + r.getId());
         if (child.getNumObjects() == maxKeys) {
             BTreeNode parent = allocateNode();
@@ -177,9 +132,12 @@ public class BTree {
     }
 
     public static BTreeNode allocateNode() {
+        System.out.printf("allocating new node. nodeCount=%d\n", nodeCount);
+
         BTreeNode node = new BTreeNode();
         node.setId(nodeCount);
         nodeCount++;
+        System.out.printf("NODE COUNT: %d\n", nodeCount);
         return node;
     }
     

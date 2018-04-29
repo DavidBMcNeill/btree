@@ -12,7 +12,9 @@ import java.util.ArrayList;
  * @authors David McNeill, Ross McCusker, Jeffrey Moore
  */
 public class GeneBankCreateBTree {
+
 	private static ArrayList<TreeObject> objs;
+
 	public static void main(String[] args) {
 
 		if (!ArgsGenerate.validate(args)) {
@@ -31,18 +33,17 @@ public class GeneBankCreateBTree {
 
 		try {
 			BTree tree = new BTree();
-			for (TreeObject to : objs) {
-				System.out.println(to); // <-- PRINTS THE LINE
-				tree.insert(to);
+			for (TreeObject obj : objs) {
+				//System.out.println(obj); // <-- PRINTS THE LINE
+				tree.insert(obj);
 			}
 
 		} catch (IOException e) {
 			System.err.printf("cannot build tree: %s\n", e);
 		}
 
-		// status message
-		System.err.printf("Btree from %s has been completed.\n It took approximately %d millis", ArgsGenerate.fileName,
-				System.currentTimeMillis() - startTime);
+		System.err.printf("Btree from %s has been completed.\n It took approximately %d millis",
+            ArgsGenerate.fileName, System.currentTimeMillis() - startTime);
 
 		// output
 		if(ArgsGenerate.debugLevel == 1) {
