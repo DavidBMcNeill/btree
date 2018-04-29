@@ -1,5 +1,5 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -12,47 +12,54 @@ import java.util.ArrayList;
  * @authors David McNeill, Ross McCusker, Jeffrey Moore
  */
 public class GeneBankCreateBTree {
+	private static ArrayList<TreeObject> objs;
+	public static void main(String[] args) {
 
-    public static void main(String[] args) {
+		if (!ArgsGenerate.validate(args)) {
+			System.err.println("our arguments did not validate, quitting...");
+			return;
+		}		
+		run();
+	}
 
-        if (!ArgsGenerate.validate(args)) {
-            System.err.println("our arguments did not validate, quitting...");
-            return;
-        }
+	private static void run() {
+		long startTime = System.currentTimeMillis();
+		// status message
+		System.err.printf("Building B-tree from DNA sequences in %s ...\n", ArgsGenerate.fileName);		
+		GeneParser parser = new GeneParser();
+		objs = parser.parse();
+		try {
+			BTree tree = new BTree();
+						
+			for (TreeObject to : objs) {
+				System.out.println(to); // <-- PRINTS THE LINE
+				tree.insert(to);
+			}
 
-        run();
-        showResults();
-    }
+		} catch (IOException e) {
+			System.err.printf("cannot build tree: %s\n", e);
+		}
+		// status message
+		System.err.printf("Btree from %s has been completed.\n It took approximately %l millis" + ArgsGenerate.fileName,
+				System.currentTimeMillis() - startTime);
+		// output
+		if(ArgsGenerate.debugLevel == 1) {
+			dump();
+		}
+	}
 
-    private static void run() {
-
-        try {
-            BTree tree = new BTree();
-            // KeyCoder coder = new KeyCoder();
-            GeneParser parser = new GeneParser();
-
-            for (TreeObject obj : parser.parse()) {
-                System.out.println(obj);   // <-- PRINTS THE LINE
-                tree.insert(obj);
-            }
-
-        } catch (IOException e) {
-            System.out.printf("cannot build tree: %s\n", e);
-        }
-    }
-
-    private static void showResults() {
-        // TODO: show results
-        if (ArgsGenerate.debugLevel == 0) {
-            // something
-        } else {
-            // ArgsGenerate.debugLevel is 1
-            // something
-        }
-    }
-
-
-
-
-
-}
+	private static void dump() {
+		//TODO needs to be in-order 
+		try {
+			KeyCoder kc = new KeyCoder();
+			PrintWriter dumpWriter = new PrintWriter("dump", "UTF-8");
+			
+			for(TreeObject to : objs) {
+				dumpWriter.printf("<%s> <%d>\n", kc.decodeKey(to.getKey(), ArgsGenerate.sequenceLength));
+			}
+			dumpWriter.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}// that's all folks
