@@ -28,9 +28,9 @@ public class GeneBankCreateBTree {
 		System.err.printf("Building B-tree from DNA sequences in %s ...\n", ArgsGenerate.fileName);		
 		GeneParser parser = new GeneParser();
 		objs = parser.parse();
+
 		try {
 			BTree tree = new BTree();
-						
 			for (TreeObject to : objs) {
 				System.out.println(to); // <-- PRINTS THE LINE
 				tree.insert(to);
@@ -39,9 +39,11 @@ public class GeneBankCreateBTree {
 		} catch (IOException e) {
 			System.err.printf("cannot build tree: %s\n", e);
 		}
+
 		// status message
-		System.err.printf("Btree from %s has been completed.\n It took approximately %l millis" + ArgsGenerate.fileName,
+		System.err.printf("Btree from %s has been completed.\n It took approximately %d millis", ArgsGenerate.fileName,
 				System.currentTimeMillis() - startTime);
+
 		// output
 		if(ArgsGenerate.debugLevel == 1) {
 			dump();

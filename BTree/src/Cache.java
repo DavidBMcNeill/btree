@@ -58,7 +58,7 @@ public class Cache {
 
 	/**
 	 * 
-	 * @param element
+	 * @param node
 	 */
 	public void add(BTreeNode node) {
 		if (cache.size() > sizeLimit) {
@@ -72,7 +72,7 @@ public class Cache {
 	 * @return
 	 */
 	public void removeLast() {
-		BTreeNode last = cache.remove(cache.size()-1)
+		BTreeNode last = cache.remove(cache.size()-1);
 		file.write(last);
 	}
 

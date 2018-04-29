@@ -107,6 +107,7 @@ public class BTreeFile {
 
             // start after the btree metadata, then go "index" node "size"s over.
             long spot = BTreeMetadata.SIZE + (node.getId() * BTreeNode.SIZE);
+            System.out.println(node.getId());
             file.seek(spot);
 
             // file.writeInt(node.index());
@@ -147,20 +148,19 @@ public class BTreeFile {
      */
     public BTreeNode read(int nodeIndex) {
 
-
         try {
             // start after the btree metadata, then go "index" node "size"s over.
             long spot = BTreeMetadata.SIZE + (nodeIndex * BTreeNode.SIZE);
             file.seek(spot);
 
-            BTreeNode node = new BTreeNode();
+            BTreeNode node = BTree.allocateNode();
             node.setLeaf(file.readBoolean());
             node.setId(file.readInt());
             node.setNumKids(file.readInt());
             node.setNumObjects(file.readInt());
 
             for (int i = 0; i < node.getNumKids(); i++) {
-                BTreeNode kid = new BTreeNode();
+                BTreeNode kid = BTree.allocateNode();
                 kid.setLeaf(file.readBoolean());
                 kid.setId(file.readInt());
                 kid.setNumKids(file.readInt());
