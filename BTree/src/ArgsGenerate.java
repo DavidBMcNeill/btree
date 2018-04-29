@@ -53,13 +53,13 @@ public class ArgsGenerate {
 			validateDegree(args[1]);
 			validateGeneBankFile(args[2]);
 			validateSequenceLength(args[3]);
-
+			//no cache and debug option 1
 			if (args.length == 5 && Integer.parseInt(args[0]) == 1) {
 				validateCacheSize(args[4]);
 			} else if (args.length == 5 && Integer.parseInt(args[0]) == 0) {
 				validateDebugLevel(args[4]);
 			}
-			System.out.println(args.length);
+			
 			if (args.length == 6) {
 				validateCacheSize(args[4]);
 				validateDebugLevel(args[5]);
