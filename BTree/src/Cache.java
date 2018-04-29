@@ -6,6 +6,8 @@ import java.util.ArrayList;
  * Cache size specified by command-line argument from GeneBankSearch call, and GeneBankCreateBTree call. 
  * 
  * @author DavidMcNeill1
+ * @param <T>
+ *
  */
 public class Cache {
 
@@ -15,8 +17,9 @@ public class Cache {
 	int sizeLimit;
 	BTreeFile file;
 
-	public Cache(int size) throws IOException {
+	public Cache(int size, BTreeFile file) throws IOException {
 		sizeLimit = size;
+		this.file = file;
 		this.cache = new ArrayList<BTreeNode>();
 	}
 
@@ -30,15 +33,21 @@ public class Cache {
 	 * @param element
 	 * @return
 	 */
-	public BTreeNode getObject(BTreeNode element) {
-		BTreeNode getElement = null; 
+	public BTreeNode getNode(int nodeIndex) {
+		BTreeNode getNode = null; 
 		
-		if (cache.indexOf(element) > -1) {
-			int elementIndex = cache.indexOf(element);
-			getElement = cache.get(elementIndex);
-		} 
+		if (nodeIndex > -1 && nodeIndex < cache.size()) {
+			getNode = cache.get(nodeIndex);
+		}
+		return getNode;
+	}
+	
+	public int indexOf(BTreeNode node) {
+		int index = -1;
 		
-		return getElement;
+		index = cache.indexOf(node);
+		
+		return index;
 	}
 	
 	/**
@@ -57,23 +66,26 @@ public class Cache {
 	}
 
 	/**
+	 * Removes the last BTreeNode
+	 * @return
+	 */
+	public void removeLast() {
+		BTreeNode last = cache.remove(cache.size()-1);
+		file.write(last);
+	}
+	
+	/**
 	 * 
-	 * @param node
+	 * @param element
 	 */
 	public void add(BTreeNode node) {
 		if (cache.size() > sizeLimit) {
 			removeLast();
 		}
 		cache.add(node);
-	}
-
-	/**
-	 * Removes the last BTreeNode in the cache and writes it to disk (Using BTreeFile's write(node) method).
-	 * @return
-	 */
-	public void removeLast() {
-		BTreeNode last = cache.remove(cache.size()-1);
-		file.write(last);
+		if (cache.size() > node.getId()) {
+			cache.remove(node.getId());	
+		}
 	}
 
 	/**
@@ -85,6 +97,16 @@ public class Cache {
 		}
 	}
 
+	/**
+	 * 
+	 * @param element
+	 */
+	public void bumpUp(BTreeNode element) {
+		int swapIndex = cache.indexOf(element);
+		BTreeNode storage = cache.remove(swapIndex);
+		cache.add(0, storage);
+	}
+	
 	/**
 	 * 
 	 * @return
