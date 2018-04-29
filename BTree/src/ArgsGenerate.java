@@ -33,6 +33,7 @@ public class ArgsGenerate {
 
     public static boolean useCache;
     public static int degree;
+    public static String fileName;
     public static File geneBankFile;
     public static int sequenceLength;
     public static int cacheSize;
@@ -127,7 +128,7 @@ public class ArgsGenerate {
      * @param s arg to validate as String
      */
     private static void validateGeneBankFile(String s) {
-
+    	fileName = s;
         File f = new File(s);
 
         if (f.exists()) {
