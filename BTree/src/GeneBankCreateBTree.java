@@ -34,7 +34,6 @@ public class GeneBankCreateBTree {
 		try {
 			BTree tree = new BTree();
 			for (TreeObject obj : objs) {
-				//System.out.println(obj); // <-- PRINTS THE LINE
 				tree.insert(obj);
 			}
 

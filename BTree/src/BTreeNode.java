@@ -51,7 +51,7 @@ public class BTreeNode {
     }
 
     public int getNumObjects() {
-        return numObjects;
+        return objects.size();
     }
 
     public void setNumObjects(int numObjects) {
@@ -90,6 +90,6 @@ public class BTreeNode {
     }
     @Override
     public String toString() {
-         return "Node [isLeaf=" + isLeaf + ", id=" + id + ", numObjects=" + numObjects + ", objects=" + objects + "]";
+        return String.format("<Node: id=%d, leaf=%b, objects=%d>", id, isLeaf, objects.size());
     }
 }

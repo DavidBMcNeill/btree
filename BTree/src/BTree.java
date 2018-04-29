@@ -80,6 +80,7 @@ public class BTree {
             }
             node.setObject(i+1, object);
             node.setNumObjects(i+1);
+            System.out.printf("WRITING: %s, nodeCount=%d\n", node, nodeCount); // <-- PRINTS THE LINE
             file.write(node);
 
         } else {
@@ -103,9 +104,9 @@ public class BTree {
 
     public void insert(TreeObject object) {
 
-//        System.out.printf("inserting into tree: %s, tree objects=%d\n", object, nodeCount);
+        System.out.printf("inserting %s\n", object);
 
-        // nodeCount++;
+        //nodeCount++;
 
 //        BTreeNode child = allocateNode();
 //        child = root;
@@ -134,10 +135,9 @@ public class BTree {
     public static BTreeNode allocateNode() {
         System.out.printf("allocating new node. nodeCount=%d\n", nodeCount);
 
+        nodeCount++;
         BTreeNode node = new BTreeNode();
         node.setId(nodeCount);
-        nodeCount++;
-        System.out.printf("NODE COUNT: %d\n", nodeCount);
         return node;
     }
     
