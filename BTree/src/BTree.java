@@ -63,10 +63,10 @@ public class BTree {
 
         parent.setObject(leftIndex, left.getObject(t - 1));
 
-        // write nodes to disk
-        file.write(right);
-        file.write(left);
-        file.write(parent);
+        // write nodes to cache or disk
+	writeNode(right);
+	writeNode(left);
+	writeNode(parent);
     }
 
     public void insertNonFull(BTreeNode node, TreeObject object) {
@@ -81,7 +81,7 @@ public class BTree {
             node.setObject(i+1, object);
             node.setNumObjects(i+1);
             System.out.printf("WRITING: %s, nodeCount=%d\n", node, nodeCount); // <-- PRINTS THE LINE
-            file.write(node);
+            writeNode(node);
 
         } else {
             while (i >= 1 && object.getKey() < node.getObject(i).getKey()) {
@@ -89,7 +89,7 @@ public class BTree {
             }
 
             i++;
-            BTreeNode n = file.read(i);
+            BTreeNode n = readNode(i);
 
             if (n.getNumKids() == maxKeys) {
                 splitChild(node, i, node.getKid(i));
@@ -142,16 +142,40 @@ public class BTree {
     }
     
 	/**
-	 * Decides whether to write to cache or write to file. 
+	 * Decides whether to write to cache or write to file.
+	 * 
 	 * @param node
 	 * @throws IOException
 	 */
 	public void writeNode(BTreeNode node) throws IOException {
 		if (useCache) {
-			cache.add(node);
+			if (cache.indexOf(node) == -1) {
+				cache.add(node);
+			}
 		} else {
 			file.write(node);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public BTreeNode readNode(int nodeIndex) throws IOException {
+		BTreeNode retrievedNode = null;
+		if (useCache) {
+			retrievedNode = cache.getNode(nodeIndex);
+		} else {
+			retrievedNode = file.read(nodeIndex);
+		}
+		return retrievedNode;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Cache getCache() {
+		return cache;
 	}
 
     /**
