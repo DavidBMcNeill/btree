@@ -77,8 +77,8 @@ public class BTree {
 
 		// write nodes to cache or disk
 		writeNode(left);
-		writeNode(parent);
 		writeNode(right);
+		writeNode(parent);
 	}
 
 	public void insertNonFull(BTreeNode node, TreeObject object) throws IOException {
