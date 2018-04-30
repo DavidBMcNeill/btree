@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class BTree {
-	private int t; // degree
+	private static int t; // degree
 	private int maxKeys;
 	private static int nodeCount = 0;
 	private BTreeNode root;
@@ -36,10 +36,11 @@ public class BTree {
 	public void splitChild(BTreeNode parent, int leftIndex, BTreeNode left) throws IOException {
 		BTreeNode right = allocateNode();
 		right.setLeaf(left.isLeaf());
-		right.setNumObjects(t - 1);
+//		right.setNumObjects(t - 1); // no need b/c set() increments
 
 		for (int j = 0; j < t - 1; j++) { // values for j?
-			right.setObject(j, left.getObject(left.getNumObjects() - 1)); // changed...
+			right.setObject(j, left.getObject(j + t)); // copy end of left to
+														// front of right
 		}
 
 		if (!left.isLeaf()) {
@@ -48,17 +49,31 @@ public class BTree {
 			}
 		}
 
-		for (int j = parent.getNumObjects() + 1; j > leftIndex + 1; j--) {
-			parent.setObject(j + 1, parent.getObject(j));
+		// left.setNumObjects(t - 1);
+
+		for (int j = parent.getNumObjects(); j > leftIndex; j--) { // got rid of
+																	// +1
+			parent.setKid(j + 1, parent.getKid(j));
 		}
 
+//		 left.setNumKids(t - 1);
 		parent.setKid(leftIndex + 1, right);
 
 		for (int j = parent.getNumObjects(); j > leftIndex; j--) {
-			parent.setObject(j + leftIndex, parent.getObject(j));
+			parent.setObject(j + 1, parent.getObject(j)); // j + 1 instead of j
+															// +
+															// leftIndex
 		}
 
 		parent.setObject(leftIndex, left.getObject(t - 1));
+
+//		left.setObject(t - 1, null);
+//
+//		for (int j = 0; j < t - 1; j++) {
+//			left.setObject(j + t, null);
+//		}
+
+//		parent.setNumObjects(parent.getNumObjects() + 1);
 
 		// write nodes to cache or disk
 		writeNode(left);
@@ -71,8 +86,8 @@ public class BTree {
 		int i = node.getNumObjects();
 
 		if (node.isLeaf()) {
-			while (i >= 1 && object.getKey() < node.peekObject(i-1).getKey()) {
-				node.setObject(i, node.getObject(i-1));
+			while (i >= 1 && object.getKey() < node.peekObject(i - 1).getKey()) {
+				node.setObject(i, node.getObject(i - 1));
 				i--;
 			}
 			node.setObject(i, object);
@@ -85,14 +100,15 @@ public class BTree {
 		} else {
 			int j = 0;
 			// find correct child
-			while (j < node.getNumObjects() && object.getKey() > node.getObject(j).getKey()) {
+			while (j < node.getNumObjects() && object.getKey() > node.peekObject(j).getKey()) {
 				j++;
 			}
-			
-			if (node.peekKid(j).getNumObjects() == 2*t - 1) {
-				splitChild(node,j,node.peekKid(j)); //call split on right child
-				
-				if (object.getKey() > node.getObject(j).getKey()) {
+
+			if (node.peekKid(j).getNumObjects() == 2 * t - 1) {
+				splitChild(node, j, node.getKid(j)); // call split on right
+														// child
+
+				if (object.getKey() > node.peekObject(j).getKey()) {
 					j++;
 				}
 			}
@@ -132,7 +148,7 @@ public class BTree {
 	public static BTreeNode allocateNode() {
 		nodeCount++;
 		System.out.printf("allocating new node. nodeCount=%d\n", nodeCount);
-		BTreeNode node = new BTreeNode();
+		BTreeNode node = new BTreeNode(t);
 		node.setId(nodeCount);
 		return node;
 	}
@@ -197,20 +213,20 @@ public class BTree {
 		System.out.printf("\tsearched node: %s\n", node);
 
 		while (i < node.getNumObjects()) {
-			if (key > node.peekObject(i).getKey()) {
+			if (key > node.getObject(i).getKey()) {
 				i++;
 			} else {
 				break;
 			}
 		}
 		if (i < node.getNumObjects()) {
-			if (key == node.peekObject(i).getKey())
+			if (key == node.getObject(i).getKey())
 				return node;
 		}
 		if (node.isLeaf()) {
 			return null;
 		}
-		return searcher(node.peekKid(i), key);
+		return searcher(node.getKid(i), key);
 	}
 
 	/**
@@ -222,7 +238,7 @@ public class BTree {
 
 	private void inOrder(BTreeNode node) {
 		for (int i = 0; i < node.getNumKids(); i++) {
-			inOrder(node.peekKid(i));
+			inOrder(node.getKid(i));
 			System.out.println(node);
 		}
 	}
