@@ -1,5 +1,4 @@
 
-
 import java.util.ArrayList;
 //import java.util.Arrays;
 //import java.util.LinkedList;
@@ -14,8 +13,8 @@ public class BTreeNode {
 
     private boolean isLeaf;
 
-    private ArrayList<TreeObject> objects;
-    private ArrayList<BTreeNode> kids;
+    private TreeObject[] objects;
+    private BTreeNode[] kids;
     private BTreeNode parent;
 
     // size of this object in bytes
@@ -26,9 +25,10 @@ public class BTreeNode {
             (maxChildren*BTreeNode.SIZE) +  // 4 kid ids of 4b int
             4;                              // 1 4b int parent id
 
-    public BTreeNode() {
-        objects = new ArrayList<>();
-        kids = new ArrayList<>();
+    public BTreeNode(int t) {
+//    	this.parent = parent;
+        objects = new TreeObject[2*t - 1];
+        kids = new BTreeNode[2*t];
         isLeaf = true;
         id = 0;
         numObjects = 0;
@@ -52,7 +52,7 @@ public class BTreeNode {
     }
 
     public int getNumObjects() {
-        return objects.size();
+        return numObjects;
     }
 
     public void setNumObjects(int numObjects) {
@@ -67,16 +67,18 @@ public class BTreeNode {
     }
     
     public TreeObject getObject(int index) {
-		numObjects--;
-        return objects.remove(index);
+    	numObjects--;
+    	TreeObject gotten = objects[index];
+    	objects[index] = null;
+        return gotten;
     }
     
     public TreeObject peekObject(int index) {
-        return objects.get(index);
+        return objects[index];
     }
 
     public void setObject(int index, TreeObject object) {
-        objects.add(index, object);
+        objects[index] = object;
         numObjects++;
     }
     public BTreeNode getParent() {
@@ -87,20 +89,22 @@ public class BTreeNode {
     }
     
     public BTreeNode getKid(int index) {
-		numKids--;
-        return kids.remove(index);
+    	numKids--;
+    	BTreeNode gotten = kids[index];
+    	kids[index] = null;
+        return gotten;
     }
     
     public BTreeNode peekKid(int index) {
-        return kids.get(index);
+        return kids[index];
     }
 
     public void setKid(int index, BTreeNode kid) {
-        kids.add(index, kid);
+    	kids[index] = kid;
         numKids++;
     }
     @Override
     public String toString() {
-        return String.format("<Node: id=%d, leaf=%b, objects=%d>", id, isLeaf, objects.size());
+        return String.format("<Node: id=%d, leaf=%b, objects=%d>", id, isLeaf, numObjects);
     }
 }
