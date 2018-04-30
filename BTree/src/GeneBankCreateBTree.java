@@ -38,7 +38,7 @@ public class GeneBankCreateBTree {
 			BTree tree = new BTree();
 			for (TreeObject obj : objs) {
 				tree.insert(obj);
-				tree.traverseInOrder();
+//				tree.traverseInOrder();
 			}
 
 		} catch (IOException e) {
@@ -70,7 +70,7 @@ public class GeneBankCreateBTree {
 		}
 
 		for(TreeObject to : objs) {
-			dumpWriter.printf("<%s> <%d>\n", kc.decodeKey(to.getKey(), ArgsGenerate.sequenceLength), to.getFreq());
+			dumpWriter.printf("%s: %d\n", kc.decodeKey(to.getKey(), ArgsGenerate.sequenceLength), to.getFreq());
 		}
 
 		dumpWriter.close();

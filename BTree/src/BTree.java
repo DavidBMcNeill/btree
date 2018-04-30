@@ -91,10 +91,7 @@ public class BTree {
 				i--;
 			}
 			node.setObject(i, object);
-			System.out.printf("WRITING: %s, nodeCount=%d\n", node, nodeCount); // <--
-																				// PRINTS
-																				// THE
-																				// LINE
+			System.out.printf("WRITING: %s, nodeCount=%d\n", node, nodeCount);
 			writeNode(node);
 
 		} else {
@@ -104,9 +101,15 @@ public class BTree {
 				j++;
 			}
 
+			System.out.printf("j=%d, kids=%d, kid=%s\n", j, node.getNumKids(), node.peekKid(j));
+
+			if (node.peekKid(j) == null) {
+			    System.err.printf("accessing kid at bad index: %s\n", node);
+			    return;
+            }
+
 			if (node.peekKid(j).getNumObjects() == 2 * t - 1) {
-				splitChild(node, j, node.getKid(j)); // call split on right
-														// child
+				splitChild(node, j, node.getKid(j)); // call split on right child
 
 				if (object.getKey() > node.peekObject(j).getKey()) {
 					j++;
@@ -233,14 +236,16 @@ public class BTree {
 	 * Traverse the tree in-order, printing each node that is visited.
 	 */
 	public void traverseInOrder() {
+	    System.out.println("============= BTREE NODES ===============");
 		inOrder(root);
+        System.out.println("=========================================");
 	}
 
 	private void inOrder(BTreeNode node) {
 		for (int i = 0; i < node.getNumKids(); i++) {
 			inOrder(node.getKid(i));
-			System.out.println(node);
 		}
+        System.out.println(node);
 	}
 
 	public BTreeMetadata getMetaData() {

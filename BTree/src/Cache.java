@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * Cache size specified by command-line argument from GeneBankSearch call, and GeneBankCreateBTree call. 
  * 
  * @author DavidMcNeill1
- * @param <T>
  *
  */
 public class Cache {
@@ -30,7 +29,7 @@ public class Cache {
 
 	/**
 	 * 
-	 * @param element
+	 * @param nodeIndex
 	 * @return
 	 */
 	public BTreeNode getNode(int nodeIndex) {
@@ -76,16 +75,16 @@ public class Cache {
 	
 	/**
 	 * 
-	 * @param element
+	 * @param node
 	 */
 	public void add(BTreeNode node) {
 		if (cache.size() > sizeLimit) {
 			removeLast();
 		}
 		cache.add(node);
-//		if (cache.size() > node.getId()) {
-//			cache.remove(node.getId());	
-//		}
+		if (cache.size() > node.getId()) {
+			cache.remove(node.getId());	
+		}
 	}
 
 	/**
@@ -116,4 +115,3 @@ public class Cache {
 		return size;
 	}
 }
-
